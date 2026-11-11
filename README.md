@@ -5,7 +5,7 @@
 写给「LLM / agent 开发零基础、但想真正看懂一个 agent 产品」的人。不要求你会写 TypeScript，也不要求手搓代码——目标是读完以后，拿到任何一个 agent 框架，都能在半小时内画出它的结构图。
 
 <p>
-  <a href="dsh-agent-learning.html"><b>📖 打开 HTML 版（推荐）</b></a>
+  <a href="https://amaterasu-kura.github.io/deepseek-harness-study/dsh-agent-learning.html"><b>📖 在线阅读 HTML 版（推荐）</b></a>
   &nbsp;·&nbsp;
   <a href="dsh-agent-learning.md">📄 Markdown 版</a>
 </p>
@@ -16,7 +16,7 @@
 
 | 版本 | 文件 | 说明 |
 |---|---|---|
-| **HTML（推荐）** | [`dsh-agent-learning.html`](dsh-agent-learning.html) | 单文件，下载后双击打开。带目录导航、折叠卡片、示意图与条形图，无服务端依赖（仅字体与首图走网络） |
+| **HTML（推荐）** | [`dsh-agent-learning.html`](dsh-agent-learning.html) · [在线阅读](https://amaterasu-kura.github.io/deepseek-harness-study/dsh-agent-learning.html) | 单文件，下载后双击打开。带目录导航、折叠卡片、示意图与条形图，无服务端依赖（仅字体与首图走网络） |
 | Markdown | [`dsh-agent-learning.md`](dsh-agent-learning.md) | 纯文本，GitHub 可直接阅读，便于检索与二次编辑 |
 
 ## 这本手册里有什么
